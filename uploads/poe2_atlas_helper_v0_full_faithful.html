@@ -1,0 +1,122 @@
+<h2 class="sr-only">Teljes PoE2 atlas-súgó demó: sustain-primer, 4 mechanika mélységében, Abyss két variánssal, Delirium kombó-mátrix, Boss és Expedition placeholder, célonként modifierek, indoklás, triázs, regex és videó-deeplink.</h2>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px;">
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem 1.25rem;">
+
+<div style="display:flex; align-items:center; gap:10px; border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom:12px; margin-bottom:14px;">
+<span style="width:6px; height:34px; background: var(--color-text-warning); border-radius:3px;" aria-hidden="true"></span>
+<div style="flex:1;"><div style="font-size:16px; font-weight:500;">Atlas súgó</div>
+<a href="https://youtu.be/b5hJUpY9S5E" style="font-size:13px; color: var(--color-text-info); text-decoration:none;"><i class="ti ti-brand-youtube" style="font-size:16px; vertical-align:-3px;" aria-hidden="true"></i> Dartagnan videója alapján · v0 demó</a></div>
+</div>
+
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding:12px 14px; margin-bottom:16px; font-size:13px; color: var(--color-text-secondary); line-height:1.65;">
+<div style="font-size:13px; font-weight:500; color: var(--color-text-primary); margin-bottom:4px;">Mielőtt belekezdesz</div>
+Az Atlas a <span style="color:var(--color-text-primary);">második fejlődési rendszered</span>: a passzív fa eldönti hogyan ölsz, az atlas fa hogy miből gazdagodsz (336 atlas pont). <span style="color:var(--color-text-primary);">#1 noob hiba:</span> túl korán profitálni — előbb waystone sustain (legyen miből mapot futni), csak utána specializálódj. A farmer-identitásod (currency / boss / breach / expedition / delirium) az atlas fán dől el.
+</div>
+
+<div style="font-size:14px; font-weight:500; margin-bottom:8px;">Mit akarsz csinálni?</div>
+<div id="goals" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:8px; margin-bottom:16px;"></div>
+
+<div id="panel"></div>
+
+</div></div>
+
+<script>
+const VID="https://youtu.be/b5hJUpY9S5E";
+const GOALS={
+ currency:{label:"Stabil currency",mech:"Abyss",icon:"ti-coins",t:765,ts:"12:45",
+  intro:"Kiszámítható currency farm — az egyik legstabilabb stratégia.",
+  variants:[
+   {vname:"Jado — nyers currency",master:"Jado",passives:"partial translations · unforcing threads · unexpected mission",
+    map:"City map (4 slot) + Grand Mirror 200% Delirium",waystone:"T15+ · 6+ mod",
+    mapcraft:"6 modra craftolva, Omennel erősítve, majd korrupt (ideál 8 mod, de 6 is jó). T16 csak ha area lvl 81 → ilvl 82.",
+    tablets:"4 Abyss tablet (2 cserélhető költségcsökkentésre)",
+    mods:[["Chance to contain +4 Abysses","a motor: több Abyss = több mob = több reward"],
+     ["Double chance Abyss Pit contains reward","nem minden pit ad értékeset — ez megemeli"],
+     ["Abyss effectiveness / closed pit (max 100%)","pitenként erősebb mob: több HP, XP, loot"],
+     ["+2 random map modifiers (minden tableten)","jelenleg a legerősebb általános tablet-stat; min. 3-mod tablet"],
+     ["Chance abyss monsters spawn w/ abyssal mod","egyik legerősebb loot-stat; 1 érezhető, 2 sem sok"],
+     ["Increased item Rarity (+ rare count, pack size)","a rengeteg mobbal kiválóan skálázódik"]],
+    keep:["a fenti kulcs-modifierek"],sell:["magas rollú Abyss tablet (drága)","Overseer → Rogue Exile dropok"],avoid:["negative Pack Size → kevesebb mob"],
+    warn:"A per-pit effectiveness + 2 random map mod nagyon tankossá teszi a mobokat — erős build kell.",
+    regex:{waystone:'"(2[2-9]|30)%.+rari" "(8|9|10)%.+pa"',tablet:'"abys" "rarit" "rando"',loot:'"ur ad|ed fro"'}},
+   {vname:"Hilda — kiegyensúlyozott",master:"Hilda",passives:"Breeding Season · Ancient Inscriptions (kötelező)",
+    map:"City map + Grand Mirror 200% Delirium",waystone:"T15/T16 · 6+ mod",mapcraft:"mint a Jado verziónál",
+    tablets:"1 Abyss + 1 Irradiated + 1 Overseer + 1 Breach tablet",
+    mods:[["Abyss tablet: +4 Abyss + abyssal effectiveness","ugyanaz a két kulcs, mint Jadónál"],
+     ["A másik 3 tableten: +1-2 random map modifier","kötelező alap"],
+     ["+ hasznos statok: rare monster, pack size, rarity","a kiegyensúlyozott loot"]],
+    keep:["Breeding Season + Ancient Inscriptions"],sell:["felesleges magas rollú tabletek"],avoid:["negative Pack Size"],
+    warn:"Kevésbé tiszta Abyss-fókusz: több liga mechanikát kombinál egy mapen → változatosabb, de szórtabb profit.",
+    regex:{waystone:'"(2[2-9]|30)%.+rari" "(8|9|10)%.+pa"',tablet:'"abys" "rarit" "al bre"',loot:'"ur ad|ed fro"'}}]},
+ breach:{label:"Breach sűrűség",mech:"Breach (+ Delirium)",icon:"ti-bolt",t:425,ts:"7:05",
+  intro:"Tömeges loot brutális sűrűségből; Deliriummal a legsűrűbb tartalom a játékban.",
+  variants:[{vname:"Jado — sűrűség",master:"Jado",passives:"partial translations · unforcing threads · unexpected mission",
+   map:"City map (4 slot) + Grand Mirror 200% Delirium",waystone:"T15+ · 6-8 mod · high rarity + effectiveness",mapcraft:"6-8 modra előkészítve",
+   tablets:"4 Breach tablet: 3× „unstable breaches summon +3 rare on stabilise” + 1 Unique Breach tablet",
+   mods:[["Unstable Breaches summon +3 rare (×3)","a rare mob adja a loot zömét; roll 1-3 — olcsóbb low-roll + Divine"],
+    ["Unique Breach tablet (+5 rare)","negyedik slot; kerüld a negatív pack size verziót"],
+    ["Monster Effectiveness","ha csak 1 stat fér: ez a legerősebb; legalább 2-t a 3 fontosból"],
+    ["Increased item Rarity","főleg már zsúfolt mapen"]],
+   keep:["unique Breach tablet","monster effectiveness"],sell:["magas rollú Breach tablet"],avoid:["negative Pack Size → kevesebb mob"],
+   warn:"Erős build kell a sűrűséghez.",
+   regex:{waystone:'"(2[2-9]|30)%.+rari" "(9|1.)%.+ef"',tablet:'"(2[5-9]|30)%.+qua|[1|2].+re mo|al bre"',loot:''}}]},
+ omen:{label:"Omen jackpot",mech:"Ritual (+ Delirium)",icon:"ti-diamond",t:1063,ts:"17:43",
+  intro:"Célzott Omen farm — nem gyors mapozás, hanem maximális tribute → reroll → omen.",
+  variants:[{vname:"Jado — omen farm",master:"Jado",passives:"partial translations · unforcing threads · unexpected mission",
+   map:"T15 · 6+ mod · area level 79+",waystone:"T15 · 6+ mod",mapcraft:"area level 79+ kötelező az Omen of Whittlinghez",
+   tablets:"1 Freedom of Fate (unique) + 2 ritual tablet (+3 favour reroll) + 1 ritual tablet (2 hasznos mod)",
+   mods:[["Reduced favour reroll cost","kötelező: több reroll ugyanannyi tribute-ból"],
+    ["Increased tribute","a Ritual saját valutája — mindent felhúz"],
+    ["Increased omen spawn chance","omen jön az unique helyett; hosszú távon óriási"],
+    ["Reduced defer cost","a drágát életben tartod a reward poolban"],
+    ["Freedom of Fate (unique tablet)","megemeli a jutalmak értékét"]],
+   keep:["Freedom of Fate tablet"],sell:["ritka, nagy értékű omenek (a jackpot)"],avoid:["area level < 79 → nincs drága omen"],
+   warn:"Delirium itt indirekt: több mob → több tribute → több reroll → omen. Kevésbé stabil, de nagy jackpot.",
+   regex:{waystone:'"(2[2-9]|30)%.+rari"',tablet:'"(2[5-9]|30)%.+red|t (2[5-9]|30)%.+sed t|al ti"',loot:''}}]},
+ delirium:{label:"Delirium",mech:"szorzó — nem önálló",icon:"ti-ghost",t:1238,ts:"20:38",special:true,
+  master:"Jado",map:"City map · T15+ · 6+ mod",
+  concept:"A Delirium nem önálló farm — a reward bar a megölt mobok számától és sűrűségétől tölt. Önmagában közepes; sok mobbal a játék egyik legerősebb módszere. (A 0.5.2 csökkentette a nehézségét: felezett unique toughness, kevesebb depth-damage.)",
+  combo:[["1. Abyss + Delirium","a legerősebb — Jado + Abyss tabletek, City map + 200% Delirium"],
+   ["2. Breach + Delirium","második — 3 breach tablet + 1 unique; rengeteg rare mob"],
+   ["3. Ritual + Delirium","más logika — indirekt: több mob → tribute → reroll → omen"]],
+  rewards:"currency, catalyst (most főleg Breach/genesis fa), simulacrum splinter — gyakran a simulacrum többet ér, mint a map loot. Cél: high size, monster effectiveness, item rarity."},
+ boss:{label:"Boss farm",mech:"a videó csak említi",icon:"ti-skull",t:362,ts:"6:02",stub:true,
+  note:"Teljesen más atlas fa: a cél nem a több mob, hanem jobb boss drop és gyorsabb boss elérés (Pinnacle bossok, speciális encounterök). A részletes setupot a készítő nem ebben a videóban adja — placeholder a teljességhez."},
+ expedition:{label:"Expedition",mech:"külön videó",icon:"ti-bomb",t:310,ts:"5:10",stub:true,
+  note:"A Return of the Ancients egyik legnagyobb nyertese, a craft- és runa-gyűjtők iránya. A készítő külön videóra tolta — emiatt itt csak placeholder."}
+};
+function pill(s){return `<span style="font-size:12px;background:var(--color-background-secondary);color:var(--color-text-secondary);padding:4px 10px;border-radius:var(--border-radius-md);">${s}</span>`;}
+function watch(g){return `<a href="${VID}?t=${g.t}" style="font-size:12px;color:var(--color-text-info);text-decoration:none;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);"><i class="ti ti-player-play" style="font-size:14px;vertical-align:-2px;" aria-hidden="true"></i> Videó · ${g.ts}</a>`;}
+function triBlock(title,color,items){return `<div style="flex:1;min-width:140px;background:var(--color-background-${color});border-radius:var(--border-radius-md);padding:10px 12px;"><div style="font-size:12px;font-weight:500;color:var(--color-text-${color});margin-bottom:4px;">${title}</div>${items.map(i=>`<div style="font-size:13px;color:var(--color-text-${color});line-height:1.5;">${i}</div>`).join("")}</div>`;}
+function rxRow(label,rx){return `<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px;"><div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:2px;">${label}</div><div style="font-family:var(--font-mono);font-size:13px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 8px;word-break:break-all;line-height:1.5;">${rx}</div></div><button data-rx='${rx}' onclick="cp(this)" style="font-size:12px;flex-shrink:0;" aria-label="Másol"><i class="ti ti-copy" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i></button></div>`;}
+function cp(b){navigator.clipboard&&navigator.clipboard.writeText(b.dataset.rx).catch(()=>{});const o=b.innerHTML;b.innerHTML='<i class="ti ti-check" style="font-size:15px;vertical-align:-2px;"></i>';setTimeout(()=>b.innerHTML=o,1200);}
+function recipeHtml(v,g){
+ const rows=[["waystone (map mod)",v.regex.waystone],["tablet",v.regex.tablet],["loot — eladnivaló",v.regex.loot]].filter(r=>r[1]);
+ const rx=rows.length?`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;margin-top:12px;"><div style="font-size:13px;font-weight:500;">Regex az ingame Ctrl-F-be</div><div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:2px;">a seed fájlodból · illusztratív, a pontos mod-szöveg kell hozzá · 250 limit</div>${rows.map(r=>rxRow(r[0],r[1])).join("")}</div>`:"";
+ const warn=v.warn?`<div style="font-size:13px;color:var(--color-text-danger);background:var(--color-background-danger);border-radius:var(--border-radius-md);padding:8px 12px;margin-top:12px;line-height:1.5;"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;" aria-hidden="true"></i> ${v.warn}</div>`:"";
+ return `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px;">${pill("master: "+v.master)}${pill(v.map)}${watch(g)}</div>
+ <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:14px;"><span style="color:var(--color-text-primary);font-weight:500;">Atlas passzívok:</span> ${v.passives}<br><span style="color:var(--color-text-primary);font-weight:500;">Tablet setup:</span> ${v.tablets}<br><span style="color:var(--color-text-primary);font-weight:500;">Waystone:</span> ${v.waystone}${v.mapcraft?`<br><span style="color:var(--color-text-primary);font-weight:500;">Map craft:</span> ${v.mapcraft}`:""}</div>
+ <div style="font-size:14px;font-weight:500;margin-bottom:8px;">Keresd ezeket (és miért)</div>
+ <div style="margin-bottom:16px;">${v.mods.map(m=>`<div style="padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);"><div style="font-size:14px;font-weight:500;font-family:var(--font-mono);">${m[0]}</div><div style="font-size:13px;color:var(--color-text-secondary);line-height:1.5;">${m[1]}</div></div>`).join("")}</div>
+ <div style="display:flex;flex-wrap:wrap;gap:8px;">${triBlock("Tartsd / keresd","success",v.keep)}${triBlock("Add el","warning",v.sell)}${triBlock("Kerüld","danger",v.avoid)}</div>${warn}${rx}`;
+}
+function deliHtml(g){return `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px;">${pill("master: "+g.master)}${pill(g.map)}${watch(g)}</div>
+ <div style="font-size:14px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:14px;">${g.concept}</div>
+ <div style="font-size:14px;font-weight:500;margin-bottom:8px;">Kombó-mátrix (erősség szerint)</div>
+ <div style="margin-bottom:14px;">${g.combo.map(c=>`<div style="padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);"><div style="font-size:14px;font-weight:500;">${c[0]}</div><div style="font-size:13px;color:var(--color-text-secondary);line-height:1.5;">${c[1]}</div></div>`).join("")}</div>
+ <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7;"><span style="color:var(--color-text-primary);font-weight:500;">Jutalmak:</span> ${g.rewards}</div>`;}
+function stubHtml(g){return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">${watch(g)}</div><div style="font-size:14px;color:var(--color-text-secondary);line-height:1.7;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;"><i class="ti ti-info-circle" style="font-size:16px;vertical-align:-2px;" aria-hidden="true"></i> ${g.note}</div>`;}
+function render(k,vi){
+ vi=vi||0;
+ document.querySelectorAll("#goals button").forEach(b=>{const on=b.dataset.k===k;b.style.borderColor=on?"var(--color-text-warning)":"var(--color-border-secondary)";b.style.background=on?"var(--color-background-secondary)":"transparent";});
+ const g=GOALS[k],p=document.getElementById("panel");
+ if(g.stub){p.innerHTML=stubHtml(g);return;}
+ if(g.special){p.innerHTML=deliHtml(g);return;}
+ let toggle="";
+ if(g.variants.length>1){toggle=`<div style="display:flex;gap:6px;margin-bottom:12px;">`+g.variants.map((vv,i)=>`<button onclick="render('${k}',${i})" style="font-size:13px;border:0.5px solid ${i===vi?"var(--color-text-warning)":"var(--color-border-secondary)"};background:${i===vi?"var(--color-background-secondary)":"transparent"};border-radius:var(--border-radius-md);padding:6px 12px;">${vv.vname}</button>`).join("")+`</div>`;}
+ const intro=g.intro?`<div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;line-height:1.6;">${g.intro}</div>`:"";
+ p.innerHTML=intro+toggle+recipeHtml(g.variants[vi],g);
+}
+document.getElementById("goals").innerHTML=Object.keys(GOALS).map(k=>{const g=GOALS[k];return `<button data-k="${k}" onclick="render('${k}')" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);"><span style="font-size:14px;font-weight:500;"><i class="ti ${g.icon}" style="font-size:18px;vertical-align:-3px;margin-right:4px;" aria-hidden="true"></i>${g.label}</span><span style="font-size:12px;color:var(--color-text-secondary);padding-left:22px;">${g.mech}</span></button>`;}).join("");
+render("currency");
+</script>

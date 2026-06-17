@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#0c0d10;color:#e9e1cf;font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(120% 75% at 50% -12%,rgba(203,169,104,.05),transparent 60%),radial-gradient(110% 60% at 50% 118%,rgba(132,104,196,.045),transparent 60%)}
+  ::selection{background:rgba(203,169,104,.32);color:#fff}
+  a{color:inherit}
+</style>
+</helmet>
+
+<div style="position:relative;z-index:1;min-height:100vh">
+
+<header style="position:sticky;top:0;z-index:40;background:rgba(11,12,15,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(203,169,104,.16)">
+  <div style="max-width:1180px;margin:0 auto;padding:13px clamp(16px,3vw,40px);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:200px">
+      <span style="display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(203,169,104,.5);transform:rotate(45deg);border-radius:5px;color:#cba968;background:linear-gradient(135deg,rgba(203,169,104,.14),transparent)"><span style="transform:rotate(-45deg);font-size:13px">◆</span></span>
+      <div>
+        <div style="font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:19px;letter-spacing:.16em;color:#e7c987;line-height:1">ATLAS&nbsp;SÚGÓ</div>
+        <div style="font-size:11.5px;color:#847d6e;letter-spacing:.03em;margin-top:3px">Path of Exile 2 · endgame farmolás újoncoknak</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+      <span style="font-size:11px;color:#b3aa97;border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:5px 11px;white-space:nowrap">UI: magyar · terms: English</span>
+      <a href="https://youtu.be/b5hJUpY9S5E" target="_blank" rel="noopener" style="font-size:12px;color:#cba968;text-decoration:none;border:1px solid rgba(203,169,104,.3);border-radius:999px;padding:5px 12px;white-space:nowrap">Dartagnan videója ↗</a>
+    </div>
+  </div>
+</header>
+
+<main style="max-width:1180px;margin:0 auto;padding:clamp(18px,3vw,34px) clamp(16px,3vw,40px) 16px">
+
+  <section style="border:1px solid rgba(255,255,255,.08);border-left:2px solid #cba968;border-radius:14px;background:linear-gradient(180deg,#16181d,#131418);margin-bottom:clamp(22px,3.5vw,32px);position:relative;z-index:30">
+    <button onClick="{{ togglePrimer }}" style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;padding:15px 18px;text-align:left">
+      <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:7px;background:rgba(203,169,104,.12);color:#cba968;font-size:13px;flex-shrink:0">✦</span>
+      <span style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:15px;letter-spacing:.04em;color:#e9e1cf;flex:1">Mielőtt belekezdesz</span>
+      <span style="font-size:11.5px;color:#847d6e;white-space:nowrap">sustain-first alapok</span>
+      <span style="color:#cba968;font-size:12px;width:14px;text-align:center;flex-shrink:0">{{ chevron }}</span>
+    </button>
+    <sc-if value="{{ primerOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 18px 17px;font-size:14.5px;color:#b3aa97;line-height:1.75;max-width:780px">
+        Az Atlas a második fejlődési rendszered: a karakterfád eldönti hogyan ölsz, az <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.atlas.enter }}" onMouseLeave="{{ gloss.atlas.leave }}" onClick="{{ gloss.atlas.tap }}">atlas passzív<sc-if value="{{ gloss.atlas.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.atlas.text }}</span></sc-if></span> fa azt, hogy miből gazdagodsz — külön 336 pont. A <span style="color:#e9e1cf;font-weight:600">#1 noob hiba</span>: túl korán „profitálni" akarni. Előbb <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.sustain.enter }}" onMouseLeave="{{ gloss.sustain.leave }}" onClick="{{ gloss.sustain.tap }}">sustain<sc-if value="{{ gloss.sustain.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.sustain.text }}</span></sc-if></span> (legyen mindig miből mapot futni), és csak utána specializálódj egy farmer-identitásra: <span style="color:#cdc4b2">currency · boss · breach · expedition · delirium</span>. A <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.waystone.enter }}" onMouseLeave="{{ gloss.waystone.leave }}" onClick="{{ gloss.waystone.tap }}">waystone<sc-if value="{{ gloss.waystone.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.waystone.text }}</span></sc-if></span> a térképed üzemanyaga; a <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.packsize.enter }}" onMouseLeave="{{ gloss.packsize.leave }}" onClick="{{ gloss.packsize.tap }}">pack size<sc-if value="{{ gloss.packsize.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.packsize.text }}</span></sc-if></span>, <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.rarity.enter }}" onMouseLeave="{{ gloss.rarity.leave }}" onClick="{{ gloss.rarity.tap }}">item rarity<sc-if value="{{ gloss.rarity.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.rarity.text }}</span></sc-if></span> és — Ritualnál — a <span style="color:#cba968;border-bottom:1px dotted rgba(203,169,104,.55);cursor:help;position:relative;white-space:nowrap" onMouseEnter="{{ gloss.tribute.enter }}" onMouseLeave="{{ gloss.tribute.leave }}" onClick="{{ gloss.tribute.tap }}">tribute<sc-if value="{{ gloss.tribute.show }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);z-index:50;width:min(264px,calc(100vw - 28px));background:#1c1f26;border:1px solid rgba(203,169,104,.4);border-radius:10px;padding:9px 11px;font-size:12.5px;color:#cdc4b2;line-height:1.55;box-shadow:0 14px 34px -12px rgba(0,0,0,.75);white-space:normal;font-weight:400">{{ gloss.tribute.text }}</span></sc-if></span> azok a statok, amikből a profit jön. Röviden, a magamfajta nooboknak: ne akarj egyszerre mindenhez érteni.
+      </div>
+    </sc-if>
+  </section>
+
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    <h2 style="font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(21px,2.6vw,27px);letter-spacing:.01em;color:#e9e1cf;margin:0">Mit akarsz csinálni?</h2>
+    <span style="font-size:13px;color:#847d6e">válassz célt — a recept azonnal frissül</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(218px,1fr));gap:12px;margin-bottom:clamp(26px,4vw,40px)">
+    <sc-for list="{{ goals }}" as="goal" hint-placeholder-count="6">
+      <button onClick="{{ goal.select }}" style="position:relative;text-align:left;background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 16px;cursor:pointer;display:flex;flex-direction:column;gap:9px;color:inherit;font:inherit;transition:transform .15s,border-color .15s" style-hover="transform:translateY(-2px);border-color:rgba(203,169,104,.45)">
+        <span style="display:flex;align-items:center;gap:11px">
+          <span style="display:grid;place-items:center;width:37px;height:37px;border-radius:9px;background:#1d2027;border:1px solid rgba(203,169,104,.2);color:#cba968;flex-shrink:0">{{ goal.glyph }}</span>
+          <span style="font-weight:600;font-size:15.5px;color:#e9e1cf">{{ goal.label }}</span>
+        </span>
+        <span style="font-size:12px;color:#847d6e;font-family:'JetBrains Mono',monospace;letter-spacing:.01em">{{ goal.mech }}</span>
+        <sc-if value="{{ goal.active }}" hint-placeholder-val="{{ false }}">
+          <span style="position:absolute;inset:0;border:1px solid #cba968;border-radius:13px;pointer-events:none;box-shadow:0 0 0 1px rgba(203,169,104,.2),0 10px 28px -12px rgba(203,169,104,.5);background:linear-gradient(180deg,rgba(203,169,104,.09),rgba(203,169,104,.02))"></span>
+        </sc-if>
+      </button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isRecipe }}" hint-placeholder-val="{{ false }}">
+    <section>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:15px">
+        <span style="display:grid;place-items:center;width:43px;height:43px;border-radius:11px;background:#1d2027;border:1px solid rgba(203,169,104,.25);color:#e7c987;flex-shrink:0">{{ headGlyph }}</span>
+        <div style="flex:1;min-width:150px">
+          <div style="font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(19px,2.3vw,23px);color:#e9e1cf;line-height:1.1">{{ goalLabel }}</div>
+          <div style="font-size:12.5px;color:#847d6e;font-family:'JetBrains Mono',monospace;margin-top:2px">{{ goalMech }}</div>
+        </div>
+        <sc-if value="{{ hasVariants }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:4px;background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:4px">
+            <sc-for list="{{ variants }}" as="vr" hint-placeholder-count="2">
+              <button onClick="{{ vr.select }}" style="{{ vr.style }}">{{ vr.name }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ hasIntro }}" hint-placeholder-val="{{ false }}">
+        <p style="font-size:14.5px;color:#b3aa97;line-height:1.7;margin:0 0 16px;max-width:740px">{{ intro }}</p>
+      </sc-if>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <sc-for list="{{ r.pills }}" as="p" hint-placeholder-count="3">
+          <span style="display:inline-flex;align-items:center;gap:8px;background:#15171c;border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:6px 13px;font-size:13px">
+            <span style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#847d6e;font-family:'JetBrains Mono',monospace">{{ p.k }}</span>
+            <span style="color:#e9e1cf">{{ p.v }}</span>
+          </span>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ r.hasWarn }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:11px;align-items:flex-start;background:linear-gradient(180deg,rgba(207,111,85,.12),rgba(207,111,85,.04));border:1px solid rgba(207,111,85,.32);border-left:3px solid #cf6f55;border-radius:11px;padding:12px 15px;margin-bottom:18px">
+          <span style="color:#e0876f;font-size:16px;line-height:1.4;flex-shrink:0">⚠</span>
+          <div style="font-size:13.5px;color:#e8bcae;line-height:1.6">{{ r.warn }}</div>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;align-items:flex-start">
+        <div style="flex:1 1 290px;display:flex;flex-direction:column;gap:13px;min-width:0">
+          <div style="background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 16px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#847d6e;margin-bottom:11px">Atlas passzívok</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <sc-for list="{{ r.passives }}" as="ps" hint-placeholder-count="3">
+                <span style="font-size:12.5px;font-family:'JetBrains Mono',monospace;background:rgba(161,140,217,.1);border:1px solid rgba(161,140,217,.26);color:#bcabe8;border-radius:7px;padding:5px 9px">{{ ps }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 16px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#847d6e;margin-bottom:11px">Tablet setup</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ r.tablets }}" as="tb" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:10px;background:#1d2027;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 11px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#e7c987;background:rgba(203,169,104,.12);border-radius:6px;padding:3px 0;min-width:34px;text-align:center;flex-shrink:0">{{ tb.qty }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13.5px;color:#e9e1cf">{{ tb.name }}</div>
+                    <sc-if value="{{ tb.hasNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#847d6e;margin-top:1px">{{ tb.note }}</div></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 16px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#847d6e;margin-bottom:9px">Waystone &amp; map craft</div>
+            <div style="font-size:13.5px;color:#b3aa97;line-height:1.6">
+              <span style="color:#e9e1cf">{{ r.waystone }}</span>
+              <sc-if value="{{ r.hasMapcraft }}" hint-placeholder-val="{{ false }}"><span style="display:block;margin-top:7px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)">{{ r.mapcraft }}</span></sc-if>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:2 1 400px;background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 18px;min-width:0">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px">
+            <div style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:16px;letter-spacing:.02em;color:#e9e1cf">Keresd ezeket</div>
+            <span style="font-size:11.5px;color:#847d6e">és miért számít</span>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#e7c987;background:rgba(203,169,104,.14);border:1px solid rgba(203,169,104,.42);border-radius:6px;padding:2px 8px">Kötelező</span>
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#bcabe8;background:rgba(161,140,217,.13);border:1px solid rgba(161,140,217,.4);border-radius:6px;padding:2px 8px">Erős</span>
+            <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#9aa0ac;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:6px;padding:2px 8px">Jó ha van</span>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ r.mods }}" as="mod" hint-placeholder-count="5">
+              <div style="padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#e9e1cf;line-height:1.45;flex:1">{{ mod.name }}</div>
+                  <span style="{{ mod.lvStyle }}">{{ mod.lvLabel }}</span>
+                </div>
+                <div style="font-size:12.5px;color:#9a9486;line-height:1.55;margin-top:4px">{{ mod.why }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:16px">
+        <div style="background:linear-gradient(180deg,rgba(143,176,115,.1),rgba(143,176,115,.03));border:1px solid rgba(143,176,115,.28);border-radius:13px;padding:14px 15px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="width:9px;height:9px;border-radius:50%;background:#8fb073;box-shadow:0 0 8px rgba(143,176,115,.6)"></span><span style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:14px;letter-spacing:.03em;color:#a7c98c">Tartsd</span></div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">
+            <sc-for list="{{ r.keep }}" as="it" hint-placeholder-count="2"><li style="font-size:13px;color:#c5cdb8;line-height:1.5;display:flex;gap:7px"><span style="color:#8fb073;font-weight:600">+</span><span>{{ it }}</span></li></sc-for>
+          </ul>
+        </div>
+        <div style="background:linear-gradient(180deg,rgba(224,177,92,.1),rgba(224,177,92,.03));border:1px solid rgba(224,177,92,.28);border-radius:13px;padding:14px 15px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="width:9px;height:9px;border-radius:50%;background:#e0b15c;box-shadow:0 0 8px rgba(224,177,92,.55)"></span><span style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:14px;letter-spacing:.03em;color:#e0b15c">Add el</span></div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">
+            <sc-for list="{{ r.sell }}" as="it" hint-placeholder-count="2"><li style="font-size:13px;line-height:1.5;display:flex;gap:7px"><span style="color:#e0b15c;font-weight:600">→</span><span style="color:#d7c8a4">{{ it }}</span></li></sc-for>
+          </ul>
+        </div>
+        <div style="background:linear-gradient(180deg,rgba(207,111,85,.1),rgba(207,111,85,.03));border:1px solid rgba(207,111,85,.28);border-radius:13px;padding:14px 15px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="width:9px;height:9px;border-radius:50%;background:#cf6f55;box-shadow:0 0 8px rgba(207,111,85,.55)"></span><span style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:14px;letter-spacing:.03em;color:#d98a73">Kerüld</span></div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px">
+            <sc-for list="{{ r.avoid }}" as="it" hint-placeholder-count="2"><li style="font-size:13px;line-height:1.5;display:flex;gap:7px"><span style="color:#cf6f55;font-weight:600">×</span><span style="color:#d6b3a8">{{ it }}</span></li></sc-for>
+          </ul>
+        </div>
+      </div>
+
+      <a href="{{ r.video }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:15px;text-decoration:none;background:linear-gradient(180deg,rgba(203,169,104,.17),rgba(203,169,104,.05));border:1px solid rgba(203,169,104,.42);border-radius:14px;padding:15px 18px;margin-bottom:16px;transition:border-color .15s,transform .15s" style-hover="border-color:rgba(203,169,104,.72);transform:translateY(-1px)">
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#cf6f55;color:#fff;font-size:15px;flex-shrink:0;box-shadow:0 5px 18px -5px rgba(207,111,85,.65)">▶</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:15.5px;color:#e7c987;letter-spacing:.02em">Nézd meg a videóban</div>
+          <div style="font-size:12.5px;color:#b3aa97;margin-top:2px;line-height:1.5">Ez a recept Dartagnan végigjátszásából készült — itt a teljes, részletes magyarázat.</div>
+        </div>
+        <span style="font-size:13px;color:#cba968;font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0">{{ r.ts }} ↗</span>
+      </a>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isDelirium }}" hint-placeholder-val="{{ false }}">
+    <section>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+        <span style="display:grid;place-items:center;width:43px;height:43px;border-radius:11px;background:#1d2027;border:1px solid rgba(161,140,217,.3);color:#bcabe8;flex-shrink:0">{{ headGlyph }}</span>
+        <div style="flex:1;min-width:150px">
+          <div style="font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(19px,2.3vw,23px);color:#e9e1cf;line-height:1.1">{{ goalLabel }}</div>
+          <div style="font-size:12.5px;color:#847d6e;font-family:'JetBrains Mono',monospace;margin-top:2px">{{ goalMech }}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <span style="display:inline-flex;align-items:center;gap:8px;background:#15171c;border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:6px 13px;font-size:13px"><span style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#847d6e;font-family:'JetBrains Mono',monospace">Master</span><span style="color:#e9e1cf">{{ d.master }}</span></span>
+        <span style="display:inline-flex;align-items:center;gap:8px;background:#15171c;border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:6px 13px;font-size:13px"><span style="font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#847d6e;font-family:'JetBrains Mono',monospace">Map</span><span style="color:#e9e1cf">{{ d.map }}</span></span>
+      </div>
+
+      <div style="background:linear-gradient(180deg,rgba(161,140,217,.1),rgba(161,140,217,.03));border:1px solid rgba(161,140,217,.26);border-left:3px solid #a18cd9;border-radius:13px;padding:15px 16px;margin-bottom:18px">
+        <div style="font-size:14.5px;color:#cabfde;line-height:1.7">{{ d.concept }}</div>
+      </div>
+
+      <div style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:16px;letter-spacing:.02em;color:#e9e1cf;margin-bottom:12px">Kombó-mátrix <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:400;font-size:12.5px;color:#847d6e;letter-spacing:0">— erősség szerint rangsorolva</span></div>
+      <sc-for list="{{ d.combo }}" as="c" hint-placeholder-count="3">
+        <div style="{{ c.cardStyle }}">
+          <div style="display:flex;gap:15px;align-items:center">
+            <span style="{{ c.rankStyle }}">{{ c.rank }}</span>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:14.5px;font-weight:500;color:#e9e1cf">{{ c.title }}</span>
+                <span style="{{ c.tierStyle }}">{{ c.tier }}-tier</span>
+              </div>
+              <div style="font-size:13px;color:#9a9486;line-height:1.55">{{ c.desc }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;width:46px;flex-shrink:0">
+              <sc-for list="{{ c.bars }}" as="bar" hint-placeholder-count="3"><span style="{{ bar }}"></span></sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+
+      <div style="background:#15171c;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:15px 16px;margin:4px 0 16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#847d6e;margin-bottom:9px">Jutalmak</div>
+        <div style="font-size:13.5px;color:#b3aa97;line-height:1.65">{{ d.rewards }}</div>
+      </div>
+
+      <a href="{{ d.video }}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:15px;text-decoration:none;background:linear-gradient(180deg,rgba(203,169,104,.17),rgba(203,169,104,.05));border:1px solid rgba(203,169,104,.42);border-radius:14px;padding:15px 18px;transition:border-color .15s,transform .15s" style-hover="border-color:rgba(203,169,104,.72);transform:translateY(-1px)">
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#cf6f55;color:#fff;font-size:15px;flex-shrink:0;box-shadow:0 5px 18px -5px rgba(207,111,85,.65)">▶</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:15.5px;color:#e7c987;letter-spacing:.02em">Nézd meg a videóban</div>
+          <div style="font-size:12.5px;color:#b3aa97;margin-top:2px;line-height:1.5">Ez a recept Dartagnan végigjátszásából készült — itt a teljes, részletes magyarázat.</div>
+        </div>
+        <span style="font-size:13px;color:#cba968;font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0">{{ d.ts }} ↗</span>
+      </a>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isStub }}" hint-placeholder-val="{{ false }}">
+    <section style="text-align:center;background:repeating-linear-gradient(135deg,#15171c,#15171c 11px,#131419 11px,#131419 22px);border:1px dashed rgba(203,169,104,.3);border-radius:16px;padding:clamp(30px,5vw,52px) 24px">
+      <div style="display:grid;place-items:center;width:62px;height:62px;margin:0 auto 16px;border-radius:15px;background:#1d2027;border:1px solid rgba(203,169,104,.25);color:#cba968">{{ headGlyph }}</div>
+      <div style="display:inline-block;font-size:10.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#cba968;border:1px solid rgba(203,169,104,.3);border-radius:999px;padding:4px 13px;margin-bottom:15px">Hamarosan</div>
+      <h3 style="font-family:'Cinzel',Georgia,serif;font-weight:700;font-size:clamp(20px,2.4vw,24px);color:#e9e1cf;margin:0 0 11px">{{ s.label }}</h3>
+      <p style="font-size:14px;color:#b3aa97;line-height:1.7;max-width:560px;margin:0 auto 20px">{{ s.note }}</p>
+      <a href="{{ s.video }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:11px;text-decoration:none;background:linear-gradient(180deg,rgba(203,169,104,.18),rgba(203,169,104,.06));border:1px solid rgba(203,169,104,.45);border-radius:12px;padding:12px 20px;font-family:'Cinzel',Georgia,serif;font-weight:600;font-size:14.5px;color:#e7c987;letter-spacing:.02em;transition:border-color .15s,transform .15s" style-hover="border-color:rgba(203,169,104,.72);transform:translateY(-1px)">
+        <span style="display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#cf6f55;color:#fff;font-size:12px;flex-shrink:0">▶</span> Nézd meg a videóban · {{ s.ts }}
+      </a>
+    </section>
+  </sc-if>
+
+  <footer style="margin-top:38px;padding:18px 0 0;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:11.5px;color:#5f5a50">
+    <span style="max-width:640px;line-height:1.5">Nem hivatalos, közösségi segédlet — nincs kapcsolat a Grinding Gear Games-szel. Eredeti, ihletett art; nem tartalmaz hivatalos PoE2 assetet.</span>
+    <span style="font-family:'JetBrains Mono',monospace;white-space:nowrap">v0 · demó</span>
+  </footer>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultGoal&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;currency&quot;,&quot;breach&quot;,&quot;omen&quot;,&quot;delirium&quot;,&quot;boss&quot;,&quot;expedition&quot;],&quot;default&quot;:&quot;currency&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;primerOpen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.VID = "https://youtu.be/b5hJUpY9S5E";
+    this.state = {
+      goal: props.defaultGoal || "currency",
+      variant: 0,
+      primer: props.primerOpen !== undefined ? props.primerOpen : false,
+      gl: null,
+      copied: null
+    };
+    this.LV = {
+      mandatory:{label:"Kötelező", c:"#e7c987", bg:"rgba(203,169,104,.14)", bd:"rgba(203,169,104,.42)"},
+      strong:{label:"Erős", c:"#bcabe8", bg:"rgba(161,140,217,.13)", bd:"rgba(161,140,217,.4)"},
+      nice:{label:"Jó ha van", c:"#9aa0ac", bg:"rgba(255,255,255,.05)", bd:"rgba(255,255,255,.13)"}
+    };
+    this.GLOSS = {
+      atlas:"Az Atlas passzív fa: külön, 336 pontos fa, ami a térképfarmod jutalmait és sűrűségét szabja — nem a karaktered erejét.",
+      sustain:"Annyi waystone-t (mapot) termelsz vissza, amennyit elhasználsz — sosem fogysz ki a futnivalóból.",
+      waystone:"A map megnyitásához használt tárgy; minél magasabb a tier és minél több a mod, annál nagyobb a haszon és a veszély.",
+      packsize:"Pack Size = mennyi szörny spawnol a mapen. Több mob = több loot és XP.",
+      rarity:"Item Rarity = a dropok mennyisége és ritkasága; magasabb rarity = több és jobb tárgy.",
+      tribute:"Tribute = a Ritual saját valutája, amiből a körben felkínált jutalmakat rerollozod és megveszed."
+    };
+    this.GOALS = {
+      currency:{ label:"Stabil currency", mech:"Abyss", icon:"currency", t:765, ts:"12:45",
+        intro:"Kiszámítható, megbízható currency-farm — az egyik legstabilabb belépő stratégia.",
+        variants:[
+          { vname:"Jado · nyers currency", master:"Jado", map:"City map (4 slot) + Grand Mirror 200% Delirium",
+            waystone:"T15+ · 6+ mod", mapcraft:"6 modra craftolva, Omennel erősítve, majd korruptálva (ideál 8 mod, de 6 is jó). T16 csak ha az area level 81 → ilvl 82.",
+            passives:["partial translations","unforcing threads","unexpected mission"],
+            tablets:[{qty:"4×",name:"Abyss tablet",note:"ebből 2 cserélhető költségcsökkentésre"}],
+            mods:[
+              {name:"Chance to contain +4 Abysses",why:"a motor: több Abyss = több mob = több reward.",level:"mandatory"},
+              {name:"+2 random map modifiers (minden tableten)",why:"jelenleg a legerősebb általános tablet-stat; minimum 3-mod tablet kell.",level:"mandatory"},
+              {name:"Double chance Abyss Pit contains reward",why:"nem minden pit ad értékeset — ez megemeli az esélyt.",level:"strong"},
+              {name:"Abyss effectiveness / closed pit (max 100%)",why:"pitenként erősebb mob: több HP, XP és loot.",level:"strong"},
+              {name:"Chance abyss monsters spawn with abyssal mod",why:"egyik legerősebb loot-stat; 1 érezhető, 2 sem sok.",level:"strong"},
+              {name:"Increased item Rarity (+ rare count, pack size)",why:"a rengeteg mobbal kiválóan skálázódik.",level:"nice"}
+            ],
+            keep:["a fenti kulcs-modifierek","magas effectiveness Abyss tablet"],
+            sell:["magas rollú Abyss tablet (drága)","Overseer → Rogue Exile dropok"],
+            avoid:["negative Pack Size → kevesebb mob"],
+            warn:"A per-pit effectiveness + 2 random map mod nagyon tankossá teszi a mobokat — erős build kell hozzá.",
+            regex:{ waystone:'"(2[2-9]|30)%.+rari" "(8|9|10)%.+pa"', tablet:'"abys" "rarit" "rando"', loot:'"ur ad|ed fro"' } },
+          { vname:"Hilda · kiegyensúlyozott", master:"Hilda", map:"City map + Grand Mirror 200% Delirium",
+            waystone:"T15/T16 · 6+ mod", mapcraft:"Ugyanaz, mint a Jado verziónál: 6+ modra craftolva, Omennel erősítve, korruptálva.",
+            passives:["Breeding Season","Ancient Inscriptions"],
+            tablets:[{qty:"1×",name:"Abyss tablet"},{qty:"1×",name:"Irradiated tablet"},{qty:"1×",name:"Overseer tablet"},{qty:"1×",name:"Breach tablet"}],
+            mods:[
+              {name:"Abyss tablet: +4 Abyss + abyssal effectiveness",why:"ugyanaz a két kulcs-stat, mint a Jado verziónál.",level:"mandatory"},
+              {name:"A másik 3 tableten: +1–2 random map modifier",why:"kötelező alap minden tableten.",level:"mandatory"},
+              {name:"Hasznos statok: rare monster, pack size, rarity",why:"ez adja a kiegyensúlyozott, vegyes lootot.",level:"nice"}
+            ],
+            keep:["Breeding Season + Ancient Inscriptions (kötelező passzív)"],
+            sell:["felesleges, magas rollú tabletek"],
+            avoid:["negative Pack Size"],
+            warn:"Kevésbé tiszta Abyss-fókusz: több liga-mechanikát kombinál egy mapen → változatosabb, de szórtabb profit.",
+            regex:{ waystone:'"(2[2-9]|30)%.+rari" "(8|9|10)%.+pa"', tablet:'"abys" "rarit" "al bre"', loot:'"ur ad|ed fro"' } }
+        ] },
+      breach:{ label:"Breach sűrűség", mech:"Breach (+ Delirium)", icon:"breach", t:425, ts:"7:05",
+        intro:"Tömeges loot brutális sűrűségből; Deliriummal a játék egyik legsűrűbb tartalma.",
+        variants:[
+          { vname:"Jado · sűrűség", master:"Jado", map:"City map (4 slot) + Grand Mirror 200% Delirium",
+            waystone:"T15+ · 6–8 mod · high rarity + effectiveness", mapcraft:"6–8 modra előkészítve, high rarity és effectiveness fókusszal.",
+            passives:["partial translations","unforcing threads","unexpected mission"],
+            tablets:[{qty:"3×",name:"Breach tablet",note:"„+3 rare on stabilise”"},{qty:"1×",name:"Unique Breach tablet"}],
+            mods:[
+              {name:"Unstable Breaches summon +3 rare (×3)",why:"a rare mob adja a loot zömét; a roll 1–3 — olcsóbb low-roll + Divine is jó.",level:"mandatory"},
+              {name:"Monster Effectiveness",why:"ha csak 1 stat fér: ez a legerősebb; legalább 2-t a 3 fontosból.",level:"strong"},
+              {name:"Unique Breach tablet (+5 rare)",why:"a negyedik slot; kerüld a negatív pack size verziót.",level:"strong"},
+              {name:"Increased item Rarity",why:"főleg már zsúfolt mapen éri meg.",level:"nice"}
+            ],
+            keep:["unique Breach tablet","monster effectiveness roll"],
+            sell:["magas rollú Breach tablet"],
+            avoid:["negative Pack Size → kevesebb mob"],
+            warn:"Erős build kell a sűrűséghez — a Breach + Delirium combó gyorsan tankossá és veszélyessé válik.",
+            regex:{ waystone:'"(2[2-9]|30)%.+rari" "(9|1.)%.+ef"', tablet:'"(2[5-9]|30)%.+qua|[1|2].+re mo|al bre"', loot:'' } }
+        ] },
+      omen:{ label:"Omen jackpot", mech:"Ritual (+ Delirium)", icon:"omen", t:1063, ts:"17:43",
+        intro:"Célzott Omen-farm — nem gyors mapozás, hanem maximális tribute → reroll → omen.",
+        variants:[
+          { vname:"Jado · omen farm", master:"Jado", map:"T15 · 6+ mod · area level 79+",
+            waystone:"T15 · 6+ mod", mapcraft:"Area level 79+ kötelező az Omen of Whittlinghez.",
+            passives:["partial translations","unforcing threads","unexpected mission"],
+            tablets:[{qty:"1×",name:"Freedom of Fate",note:"unique"},{qty:"2×",name:"Ritual tablet",note:"+3 favour reroll"},{qty:"1×",name:"Ritual tablet",note:"2 hasznos mod"}],
+            mods:[
+              {name:"Reduced favour reroll cost",why:"kötelező: több reroll ugyanannyi tribute-ból.",level:"mandatory"},
+              {name:"Increased tribute",why:"a Ritual saját valutája — mindent felhúz.",level:"mandatory"},
+              {name:"Increased omen spawn chance",why:"omen jön az unique helyett; hosszú távon óriási.",level:"strong"},
+              {name:"Reduced defer cost",why:"a drága rewardot életben tartod a poolban.",level:"strong"},
+              {name:"Freedom of Fate (unique tablet)",why:"megemeli a jutalmak értékét.",level:"nice"}
+            ],
+            keep:["Freedom of Fate tablet"],
+            sell:["ritka, nagy értékű omenek (ez a jackpot)"],
+            avoid:["area level < 79 → nincs drága omen"],
+            warn:"A Delirium itt indirekt: több mob → több tribute → több reroll → omen. Kevésbé stabil, de nagy a jackpot.",
+            regex:{ waystone:'"(2[2-9]|30)%.+rari"', tablet:'"(2[5-9]|30)%.+red|t (2[5-9]|30)%.+sed t|al ti"', loot:'' } }
+        ] },
+      delirium:{ label:"Delirium", mech:"szorzó — nem önálló farm", icon:"delirium", t:1238, ts:"20:38", special:true,
+        master:"Jado", map:"City map · T15+ · 6+ mod",
+        concept:"A Delirium nem önálló farm — a reward bar a megölt mobok számától és sűrűségétől tölt. Önmagában közepes; sok mobbal viszont a játék egyik legerősebb módszere. (A 0.5.2 csökkentette a nehézségét: felezett unique toughness, kevesebb depth-damage.) Ezért mindig egy sűrűség-mechanika MELLÉ tedd.",
+        combo:[
+          {rank:1,tier:"S",strength:3,title:"Abyss + Delirium",desc:"A legerősebb. Jado + Abyss tabletek, City map + 200% Delirium — a sűrűség hajtja a reward bart."},
+          {rank:2,tier:"A",strength:2,title:"Breach + Delirium",desc:"Második. 3 Breach tablet + 1 unique — rengeteg rare mob, gyorsan tölti a depth-et."},
+          {rank:3,tier:"B",strength:1,title:"Ritual + Delirium",desc:"Más logika: indirekt. Több mob → több tribute → több reroll → omen."}
+        ],
+        rewards:"Currency, catalyst (most főleg Breach/genesis fa) és simulacrum splinter — gyakran a simulacrum többet ér, mint a teljes map loot. Cél: high size, monster effectiveness, item rarity." },
+      boss:{ label:"Boss farm", mech:"a videó csak említi", icon:"boss", t:362, ts:"6:02", stub:true,
+        note:"Teljesen más atlas fa: a cél nem a több mob, hanem a jobb boss-drop és a gyorsabb boss-elérés (Pinnacle bossok, speciális encounterök). A részletes setupot a készítő nem ebben a videóban adja — ez itt placeholder a teljességhez." },
+      expedition:{ label:"Expedition", mech:"külön videó", icon:"expedition", t:310, ts:"5:10", stub:true,
+        note:"A Return of the Ancients egyik legnagyobb nyertese — a craft- és runa-gyűjtők iránya. A készítő külön videóra tolta, így itt egyelőre csak placeholder szerepel." }
+    };
+  }
+
+  selectGoal(k){ this.setState({goal:k, variant:0, gl:null, primer:false}); }
+  selectVariant(i){ this.setState({variant:i}); }
+  togglePrimer(){ this.setState(s=>({primer:!s.primer})); }
+  glEnter(k){ this.setState({gl:k}); }
+  glLeave(k){ this.setState(s=> s.gl===k ? {gl:null} : null); }
+  glTap(k){ this.setState(s=>({gl: s.gl===k ? null : k})); }
+  copy(key,text){
+    try{ if(navigator.clipboard) navigator.clipboard.writeText(text); }catch(e){}
+    this.setState({copied:key});
+    clearTimeout(this._ct);
+    this._ct = setTimeout(()=>this.setState({copied:null}), 1300);
+  }
+
+  glyph(t){
+    const E = React.createElement;
+    const C = p => E("circle", p);
+    const L = p => E("line", p);
+    const P = p => E("polygon", p);
+    let kids = [];
+    if(t==="currency") kids=[C({cx:12,cy:12,r:8}), C({cx:12,cy:12,r:3.2})];
+    else if(t==="breach") kids=[L({x1:12,y1:3,x2:12,y2:21}), L({x1:3,y1:12,x2:21,y2:12}), L({x1:6,y1:6,x2:18,y2:18}), L({x1:18,y1:6,x2:6,y2:18})];
+    else if(t==="omen") kids=[P({points:"12,3 21,12 12,21 3,12"}), C({cx:12,cy:12,r:2,fill:"currentColor",stroke:"none"})];
+    else if(t==="delirium") kids=[C({cx:12,cy:12,r:8,strokeDasharray:"3 3.4"}), C({cx:12,cy:12,r:3})];
+    else if(t==="boss") kids=[P({points:"12,3 21,20 3,20"}), C({cx:9.2,cy:15,r:1,fill:"currentColor",stroke:"none"}), C({cx:14.8,cy:15,r:1,fill:"currentColor",stroke:"none"})];
+    else if(t==="expedition") kids=[P({points:"12,4 19,8 19,16 12,20 5,16 5,8"}), C({cx:12,cy:12,r:2.4})];
+    return E("svg", {width:22,height:22,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.4,strokeLinecap:"round",strokeLinejoin:"round"}, ...kids);
+  }
+
+  buildGloss(){
+    const o = {}, G = this.GLOSS, S = this.state;
+    for(const k in G){
+      o[k] = { text:G[k], show:S.gl===k, enter:()=>this.glEnter(k), leave:()=>this.glLeave(k), tap:()=>this.glTap(k) };
+    }
+    return o;
+  }
+
+  renderVals(){
+    const S = this.state, ALL = this.GOALS;
+    const goals = Object.keys(ALL).map(k=>{
+      const g = ALL[k];
+      return { key:k, label:g.label, mech:g.mech, active:S.goal===k, glyph:this.glyph(g.icon), select:()=>this.selectGoal(k) };
+    });
+    const g = ALL[S.goal];
+    const out = {
+      goals,
+      primerOpen:S.primer,
+      togglePrimer:()=>this.togglePrimer(),
+      chevron: S.primer ? "▾" : "▸",
+      gloss: this.buildGloss(),
+      isRecipe:false, isDelirium:false, isStub:false,
+      goalLabel:g.label, goalMech:g.mech, headGlyph:this.glyph(g.icon)
+    };
+
+    if(g.stub){
+      out.isStub = true;
+      out.s = { label:g.label, note:g.note, video:this.VID+"?t="+g.t, ts:g.ts };
+      return out;
+    }
+
+    if(g.special){
+      out.isDelirium = true;
+      const tierMeta = {1:{c:"#e7c987",bg:"rgba(203,169,104,.14)",bd:"rgba(203,169,104,.4)"},2:{c:"#bcabe8",bg:"rgba(161,140,217,.13)",bd:"rgba(161,140,217,.38)"},3:{c:"#9aa0ac",bg:"rgba(255,255,255,.05)",bd:"rgba(255,255,255,.13)"}};
+      out.d = {
+        concept:g.concept, rewards:g.rewards, master:g.master, map:g.map,
+        video:this.VID+"?t="+g.t, ts:g.ts,
+        combo: g.combo.map(c=>{
+          const tm = tierMeta[c.rank];
+          return {
+            rank:c.rank, title:c.title, desc:c.desc, tier:c.tier,
+            cardStyle:{ background:"#15171c", border:"1px solid "+(c.rank===1?"rgba(203,169,104,.32)":"rgba(255,255,255,.08)"), borderRadius:"13px", padding:"15px 16px", marginBottom:"10px", boxShadow: c.rank===1?"0 8px 26px -14px rgba(203,169,104,.4)":"none" },
+            rankStyle:{ fontFamily:"'Cinzel', Georgia, serif", fontWeight:700, fontSize:"27px", color:tm.c, lineHeight:1, minWidth:"24px", textAlign:"center", flexShrink:0 },
+            tierStyle:{ fontFamily:"'JetBrains Mono', monospace", fontSize:"10.5px", fontWeight:700, letterSpacing:".05em", padding:"3px 9px", borderRadius:"7px", color:tm.c, background:tm.bg, border:"1px solid "+tm.bd },
+            bars:[1,2,3].map(n=>({ height:"5px", borderRadius:"3px", background: n<=c.strength ? tm.c : "rgba(255,255,255,.1)" }))
+          };
+        })
+      };
+      return out;
+    }
+
+    out.isRecipe = true;
+    const vi = Math.min(S.variant, g.variants.length-1);
+    const v = g.variants[vi];
+    out.hasVariants = g.variants.length > 1;
+    out.variants = g.variants.map((vv,i)=>({
+      name:vv.vname,
+      active:i===vi,
+      select:()=>this.selectVariant(i),
+      style:{ fontFamily:"'JetBrains Mono', monospace", fontSize:"12.5px", border:"none", borderRadius:"8px", padding:"7px 13px", cursor:"pointer", whiteSpace:"nowrap", background: i===vi?"#cba968":"transparent", color: i===vi?"#16140e":"#b3aa97", fontWeight: i===vi?600:500 }
+    }));
+    out.hasIntro = !!g.intro; out.intro = g.intro;
+    out.r = {
+      master:v.master, map:v.map, waystone:v.waystone, hasMapcraft:!!v.mapcraft, mapcraft:v.mapcraft,
+      passives:v.passives,
+      tablets: v.tablets.map(tb=>({ qty:tb.qty, name:tb.name, hasNote:!!tb.note, note:tb.note })),
+      pills:[ {k:"Master", v:v.master}, {k:"Map", v:v.map.split("+")[0].trim()}, {k:"Waystone", v:v.waystone} ],
+      mods: v.mods.map(m=>{
+        const lv = this.LV[m.level];
+        return { name:m.name, why:m.why, lvLabel:lv.label,
+          lvStyle:{ color:lv.c, background:lv.bg, border:"1px solid "+lv.bd, fontSize:"10px", fontFamily:"'JetBrains Mono', monospace", borderRadius:"6px", padding:"3px 8px", whiteSpace:"nowrap", flexShrink:0, alignSelf:"flex-start" } };
+      }),
+      keep:v.keep, sell:v.sell, avoid:v.avoid,
+      hasWarn:!!v.warn, warn:v.warn,
+      video:this.VID+"?t="+g.t, ts:g.ts
+    };
+
+    return out;
+  }
+}
+</script>
+</body>
+</html>
