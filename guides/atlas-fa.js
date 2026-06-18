@@ -1,15 +1,12 @@
 /* ============================================================================
    GUIDE: Atlas Passzív Fa kezdés  (Dartagnan — "Így rakd ki az Atlas pontjaidat")
    ----------------------------------------------------------------------------
-   Ez egy ÚJ tartalomtípus (type: "atlastree") — nem farm-recept, hanem a fő
-   atlas fa ajánlott kezdése + a mechanikák külön fái.
+   ÚJ tartalomtípus (type: "atlastree"): a fő atlas fa végigjárása + a mechanikák
+   külön fái, MINDEN node-dal. Önregisztráló: hozzáfűz egy célt az ATLAS.goals-hoz.
 
-   Külön fájlban van (nem a content.js-ben), és magától beregisztrálja magát az
-   appba: hozzáfűz egy új célt a window.ATLAS.goals listához. Így működik majd a
-   "1 videó = 1 fájl" elv. Az index.html a content.js UTÁN tölti be ezt.
-
-   MINDEN ingame név poe2db.tw / poe2wiki / Game8 ellen ellenőrizve (lásd a
-   chat verifikációs riportját). Bizonytalan tételek külön jelölve a végén.
+   MINDEN ingame név poe2db.tw / poe2wiki / Game8 ellen ellenőrizve.
+   A "(?)" jelölés = a pontos node-nevet a források nem erősítették meg
+   egyértelműen (a 0.5 atlas nagyon friss) → kliensben ellenőrizendő.
    ========================================================================== */
 
 window.ATLAS.goals.push({
@@ -21,13 +18,13 @@ window.ATLAS.goals.push({
   videoSeconds: 5,
   videoTime: "0:05",
   patch: "0.5 · Return of the Ancients",
-  intro: "Dartagnan ajánlott Atlas passzív fa kezdése: előbb a sustain-first fő fa, majd mechanikánként a külön fák. Minden node-név poe2db-vel ellenőrizve. Cél: kezdőként ne vessz el — rakd ki a fő fát, aztán válassz egy mechanikát.",
+  intro: "Dartagnan ajánlott Atlas passzív fa kezdése: előbb a sustain-first fő fa, majd mechanikánként a külön fák — minden node-dal. Minden név poe2db-vel ellenőrizve. Cél: kezdőként ne vessz el — rakd ki a fő fát, aztán mélyíts egy mechanikát.",
 
-  /* ---- FŐ FA: ajánlott sorrend (sustain-first) ---- */
+  /* ---- FŐ FA: teljes ajánlott végigjárás (sustain-first) ---- */
   steps: [
     {
       title: "Fel a fa tetejére — tablet node-ok",
-      detail: "Ez fizet vissza a leggyorsabban: minden tabletedet felhúzza. Az Arbiter of Divinity legyőzése után jönnek a jobb (3→4 modos) rare tabletek.",
+      detail: "Ez fizet vissza a leggyorsabban: minden tabletedet felhúzza. Az Arbiter of Divinity legyőzése után jönnek a 3→4 modos rare tabletek, plusz egy kis esély, hogy belépéskor nem fogy a tablet.",
       nodes: ["Partial Translation", "Reverse Transcription", "Propagating Secrets"],
     },
     {
@@ -36,70 +33,107 @@ window.ATLAS.goals.push({
       nodes: ["Strongbox", "Shrine", "Azmeri Spirit", "Essence", "Summoning Circle", "Rogue Exiles"],
     },
     {
-      title: "Általános „minden mapen” statok",
-      detail: "Sűrűség + sustain: ez megy minden farmhoz. A waystone drop a térkép-üzemanyagod.",
-      nodes: ["Increased Rare Monsters", "Magic Monsters", "Pack Size", "Item Rarity", "Waystone Drop Chance"],
+      title: "Középső választható keystone-ok",
+      detail: "Négy választható keystone van itt. Első körben a Shrine-t vedd, másodjára a monster effectiveness-t. Mellette rarity biome-onként, illetve a tablet- és waystone-darabszám esését csökkentő node-ok.",
+      nodes: ["Shrine (keystone)", "Monster Effectiveness", "Rarity / biome", "Tablet & Waystone drop", "Explicit modifier"],
     },
     {
-      title: "Rare-monster sűrűség — Nemesis Rising",
-      detail: "A tabletek után a második legnagyobb szorzó. Több rare-modifier = több loot, de tankosabb mobok — erős build kell hozzá.",
-      nodes: ["Nemesis Rising", "Desert rare-monster cluster"],
+      title: "Biome-keystone + Forest / Lineage",
+      detail: "A History of the Ezomites/Faridun keystone-nal az Ezomite city mapek egyben Grassland biome-ként is számítanak (így egy biome masteryt tudsz stackelni). Forest Mastery → Lineage Support gem drop, főleg unique mapen hasznos.",
+      nodes: ["History of the Ezomites (?)", "Forest Mastery", "Lineage Support"],
     },
     {
-      title: "Shrine ág — Seeking Shrine",
-      detail: "A Seeking Shrine item rarity-t ad (a Gloom Shrine damage-et). A mini-node-okkal hosszabb és erősebb a buff, és magic packok őrzik a shrine-t.",
-      nodes: ["Seeking Shrine", "Prayer of Guidance"],
+      title: "4-mod tabletek + city → grass & desert",
+      detail: "Észak felé a Reverse Transcription / Propagating Secrets + Arbiter adja a 4-mod tableteket. A History of Faridun a cityket grass+desert biome-má is teszi; a Desert Mastery +15% effectiveness-t ad minden desert mapre.",
+      nodes: ["Reverse Transcription", "Propagating Secrets", "History of Faridun (?)", "Desert Mastery"],
     },
     {
-      title: "Magic pack — Evolving Thorns",
-      detail: "A pack size oldalt válaszd. Magic moboknak NE adj modifiert — azt a rare moboknak akarjuk (azt fent már megoldottuk).",
-      nodes: ["Evolving Thorns"],
+      title: "Currency + rarity (bal oldal)",
+      detail: "A Rogue Exile-okon át a Water Mastery currency node-ig: a ládákban +15% currency. Majd Enigmatic Intensification és Risk and Reward: rarity és effect minden explicit modifier után a mapen/waystone-on.",
+      nodes: ["Water Mastery", "Enigmatic Intensification", "Risk and Reward"],
     },
     {
-      title: "Válassz EGY biome-ot és építsd ki",
-      detail: "Ne szórd szét. Desert = rare monsterek; Grass = pack size + currency-upgrade; Swamp = exalted→chaos. Mellé: Eons of Domination (Overseer tablet), Hidden Scars (Fracturing Orb), Blood on the Stone.",
-      nodes: ["Desert / Grass / Swamp Mastery", "Eons of Domination", "Eons of Contamination", "Hidden Scars", "Blood on the Stone"],
+      title: "Alap fa kész (sustain elérve)",
+      detail: "Jobb felül a City→Forest keystone, plusz explicit modifier növelés és +15% quantity a map bossokra. Innen a waystone fenntartható, a bossok jobb itemet dobnak, tabletek is jönnek a lootban.",
+      nodes: ["City → Forest keystone (?)", "Map boss +15% quantity"],
+    },
+    {
+      title: "Overseer + powerful bossok",
+      detail: "Jobbra az Eons of Domination: a powerful map bossok Overseer precursor tabletet is dobnak. Ha Summoning Circle-re építesz, a Blood on the Stone a megidézett bossokat powerful bossá teszi.",
+      nodes: ["Eons of Domination", "Blood on the Stone"],
+    },
+    {
+      title: "Rare sűrűség — Nemesis Rising",
+      detail: "A Nemesis Rising a rare moboknak nagyobb eséllyel ad modifiert (több mod = több loot, de tankosabb). Az Eons of Contamination az Irradiated tableteket nyitja; mellé rare + magic monster node-ok.",
+      nodes: ["Nemesis Rising", "Eons of Contamination", "Rare + Magic monsters"],
+    },
+    {
+      title: "Innen minden opcionális — sűrítsd a contentet",
+      detail: "Seeking Shrine + mini-node-ok (rarity, magic packok őrzik). Evolving Thorns: a magic packoknál a pack size oldalt vedd. Hidden Scars: cleansed mobok Fracturing Orbot dobnak. Mountain Mastery +50% tablet, Swamp 10% exalted→chaos, Grass 5% currency-upgrade. A Rogue Exile gear-bias (Wealthy Targets) és a spiritek (Primal/Wild/Vivid → Rite of Passage) ízlés szerint.",
+      nodes: ["Seeking Shrine", "Evolving Thorns", "Hidden Scars", "Mountain Mastery", "Swamp Mastery", "Grass Mastery", "Wealthy Targets (?)", "Rite of Passage"],
     },
   ],
 
-  /* ---- MECHANIKA-FÁK ---- */
+  /* ---- MECHANIKA-FÁK (teljes node-listák) ---- */
   trees: [
     {
       name: "Vaal Temple",
       sub: "Fate of the Vaal",
-      note: "A templom szobákból épül; a cél több reward-room + medallion → Atziri. ⚠️ A Secrets of the Ancients NEM respeccelhető — terraforming/research roomokat ad a reward-roomok helyett, kezdőként kerüld.",
+      note: "A templom szobákból épül; a cél több reward-room + medallion → Atziri. ⚠️ A Secrets of the Ancients NEM respeccelhető, terraforming/research roomokat ad a reward-roomok helyett — kezdőként kerüld.",
       best: "„Több juice per room” klaszter (Efficient Arteries · Power Relays · Transcendent Progress · Machinations) + Patrolling Legions + The Lost Architect — több mini-boss és modifier-medallion.",
       nodes: [
-        { name: "Riches of the Empire", level: "strong", why: "~15% esély a temple currency duplázására." },
+        { name: "Efficient Arteries", level: "strong", why: "„Több juice per room” klaszter — room-sűrűség/jutalom." },
+        { name: "Power Relays", level: "strong", why: "Templom room-módosítók hatása +10%." },
+        { name: "Transcendent Progress", level: "strong", why: "A templom roomjai tier n-re is fejleszthetők." },
+        { name: "Machinations (?)", level: "strong", why: "„Több juice per room” (a „Xipocados-” prefix nem hitelesített)." },
         { name: "Patrolling Legions", level: "strong", why: "Több Vaal mini-boss + modifier-medallion." },
-        { name: "The Lost Architect", level: "strong", why: "Párban a Patrolling Legionsszel — extra mini-bossok." },
-        { name: "Royal Prerogative", level: "strong", why: "Kevesebb room-törlés (Destabilisation)." },
+        { name: "The Lost Architect", level: "strong", why: "A Patrolling Legions párja — extra mini-bossok." },
+        { name: "Riches of the Empire", level: "strong", why: "~15% esély a temple currency duplázására." },
+        { name: "Royal Prerogative", level: "strong", why: "Kevesebb Destabilisation (room-törlés)." },
         { name: "Expanded Design", level: "strong", why: "+Restricted Room minden Architect-ölésért." },
-        { name: "Offerings to the Queen", level: "nice", why: "Korai pick: több temple currency a beacon-ládákból." },
-        { name: "Secrets of the Ancients", level: "nice", why: "FIGYELEM: trap, nem respeccelhető — kihagyni ajánlott." },
+        { name: "Protected Treasures", level: "nice", why: "Több loot az Architect-roomokból (fixált ládák)." },
+        { name: "Stolen Authority", level: "nice", why: "Több Medallion (~+35%, % nem hitelesített)." },
+        { name: "Offerings to the Queen", level: "nice", why: "Korai: több temple currency a beacon-ládákból." },
+        { name: "Loyal Gatekeepers", level: "nice", why: "Korai beacon-node: extra loot/mob a Vaal Beaconöknél." },
+        { name: "Military Reinforcement", level: "nice", why: "Több szörny a Vaal Beaconöknél." },
+        { name: "Training and Preparation", level: "nice", why: "+1 area level az egész templomnak." },
+        { name: "Bloodright Investments", level: "nice", why: "Atziri Sacrificial Regalia (unique armour) dobás." },
+        { name: "Secrets of the Ancients", level: "nice", why: "⚠️ TRAP: nem respeccelhető, kiszorítja a reward-roomokat — kihagyni ajánlott." },
       ],
       terms: [
         { k: "Vaal Beacon", v: "Abyss-szerű beacon a mapen, ami felerősíti a közeli mobokat." },
-        { k: "Zantipi's Medallion", v: "Random waystone-modot rak a templomra (több veszély + jutalom)." },
+        { k: "Zantipi's Medallion", v: "Random waystone-modot rak a templomra (több veszély + jutalom; max 8 mod)." },
+        { k: "Heirlooms / Atziri's Assets (?)", v: "A 4-választós központi reward-keystone — pontos neve nem hitelesített." },
       ],
     },
     {
       name: "Abyss",
       sub: "pit-sűrűség",
       note: "A cél minél több Abyss Pit (több pit = több mob, láda, jutalom). A Balance of Power-nél válassz frakciót. Dartagnan ajánlása: Amanamu + Omen-farm (az Omeneknek jó áruk van).",
-      best: "Dark Depths + From Below + Lord of the Pit — az „extra-pit” volumen-vonal: brutálisan megsokszorozza a piteket.",
+      best: "Dark Depths + From Below + Lord of the Pit — az „extra-pit” volumen-vonal: brutálisan megsokszorozza a piteket (több mob, láda, jutalom).",
       nodes: [
-        { name: "Lord of the Pit", level: "mandatory", why: "Keystone: pitek szétszórva + abyss-effectiveness/lezárt pit (max 100%)." },
+        { name: "Lord of the Pit", level: "mandatory", why: "Keystone: pitek szétszórva + abyss-effectiveness/lezárt pit (max 100%) + 20% +abyss." },
         { name: "Dark Depths", level: "mandatory", why: "10/20/30% esély +pitekre — a volumen motorja." },
         { name: "From Below", level: "strong", why: "Minden abyss +1 pitet tartalmaz." },
         { name: "Stir the Swarm", level: "strong", why: "A mapjaid +1 abysst tartalmaznak." },
-        { name: "Unholy Influence", level: "strong", why: "+100% esély, hogy az abyss-mobok abyssal-modot kapnak." },
-        { name: "Endless War", level: "strong", why: "Overrun abyss után 50% eséllyel a szomszéd mapet is elárasztja." },
+        { name: "Unholy Influence", level: "strong", why: "+100% esély abyssal-modra (és Lichborn-esélyre)." },
+        { name: "Sprawling Rupture", level: "strong", why: "+25% szörny / több repedés az abyssban." },
+        { name: "Endless War", level: "strong", why: "Overrun abyss után 50% eséllyel a szomszéd map is elárasztva." },
+        { name: "Shadow of Undeath", level: "strong", why: "+50% esély abyss-befolyásolt Rogue Exile-re (Lichborn → Heart of the Well jewel)." },
+        { name: "Dark Bloodlines", level: "nice", why: "Az Abyss Pit 25% eséllyel minden mobot ≥Magic-ra emel." },
+        { name: "Close to the Surface", level: "nice", why: "A waystone explicit modjai az Abyssal Depthsre is érvényesek." },
         { name: "Vile Treasures", level: "nice", why: "Keystone: +50% abyss-drop (Abyssal Eyes / Omens / Lineage)." },
+        { name: "Blessing of the Source", level: "nice", why: "Heart of the Well jewel 5% eséllyel +1 desecrated mod." },
+        { name: "Rotting Bones", level: "nice", why: "+25% esély Ancient Desecrated Currency-re." },
+        { name: "Ghastly Relics", level: "nice", why: "A végső pit nagy ládája Abyssal Strongboxszá válik." },
+        { name: "Armaments of Evil", level: "nice", why: "Az abyss-mobok T5 rare gearje desecrated modot kap." },
+        { name: "Strange Aversions", level: "nice", why: "Frakció-ládatípusok: Ulaman=currency, Kurgal=weapon, Amanamu=armour (⚠️ állítólag bugos)." },
+        { name: "Abyssal Depths boss (?)", level: "nice", why: "78+ areán Abyssal Depths boss + Igrulog, the Incubator Queen a pitben." },
       ],
       terms: [
         { k: "Balance of Power", v: "Frakció-keystone: Amanamu (armour, Omen-farm) · Ulaman (currency) · Kurgal (weapon)." },
         { k: "Lichborn", v: "Abyss-befolyásolt Rogue Exile — a Heart of the Well jewelek forrása." },
+        { k: "Well of Souls", v: "Itt teszed fel a Desecrated modokat Ancient Desecrated Currency-vel." },
       ],
     },
     {
@@ -111,14 +145,25 @@ window.ATLAS.goals.push({
         { name: "Reactive Hiveseeding", level: "strong", why: "Breach teljesítésekor 10% esély hive-ot rakni egy közeli mapre." },
         { name: "Frantic Invasion", level: "strong", why: "+100% esély, hogy Vruun, Marshal of Xesht megjelenjen." },
         { name: "Swelling Hives", level: "strong", why: "A breach hive-ok +1 szörnyhullámot tartalmaznak." },
+        { name: "Shape the Chains", level: "strong", why: "Keystone: rare effectiveness +30% VAGY +15% pack size (volumenhez ez utóbbi)." },
         { name: "Reality Wound", level: "nice", why: "Az unstable breachek +10 mp-ig maradnak nyitva." },
-        { name: "Shape the Chains", level: "strong", why: "Keystone: rare effectiveness +30% VAGY +15% pack size." },
+        { name: "Moment of Risk", level: "nice", why: "Womb gift +1 level/explicit mod; stabilizált breach +2 rare." },
+        { name: "Essence Transference", level: "nice", why: "Breach közeli essence-ek 20% eséllyel Essence of the Breach." },
+        { name: "Sole Purpose", level: "nice", why: "Keystone: Ailith hive-skilljei (+100% dmg VAGY +50% darab)." },
+        { name: "Provoke the Swarm", level: "nice", why: "Ailith szörny-idéző skilleket kap, +25% skill." },
+        { name: "Study the Chains", level: "nice", why: "Vruun +50% eséllyel dob Lineage Supportot." },
         { name: "Tear Open the Rift", level: "nice", why: "Keystone: a breach stronghold-ok modokat adnak a felfedett mapekhez." },
+        { name: "Breeding Program", level: "nice", why: "Keystone: válassz womb gift típust (+100% a választottra)." },
+        { name: "Flesh Flower", level: "nice", why: "Vruun fejét a Genesis Tree-hez viszed → feloldja a Grasping Orchidot." },
+        { name: "Growing Wealth", level: "nice", why: "Genesis Tree +5 passzív pont a Currency Womb-ra." },
+        { name: "Exquisite Design", level: "nice", why: "Genesis Tree +5 passzív pont az Amulet Womb-ra." },
+        { name: "Diverse Control", level: "nice", why: "Genesis Tree +2 passzív pont MINDEN Womb-ra." },
       ],
       terms: [
         { k: "Ailith", v: "A hive-védő NPC (a transcript „Elite”-nek hallotta), őt véded a hullámok közben." },
         { k: "Vruun, Marshal of Xesht", v: "A ritka Breach-boss; a Flesh Flower → Grasping Orchid hozzá kötődik." },
         { k: "Wombgift", v: "Signet=gyűrű · Ornate=amulet · Banded=öv · Lavish=currency · Revelatory=breachstone." },
+        { k: "Lineage Supports", v: "Xoph's Pyre · Esh's Radiance · Tul's Stillness · Uul-Netol's Embrace." },
       ],
     },
     {
@@ -130,31 +175,52 @@ window.ATLAS.goals.push({
         { name: "Patient Devotion", level: "mandatory", why: "Defer 50% olcsóbb és 50%-kal hamarabb tér vissza — a drága rewardot életben tartja." },
         { name: "Magnanimous Offerings", level: "strong", why: "20% esély ingyen rerollra." },
         { name: "Tempting Offers", level: "strong", why: "+1 reroll altáronként." },
-        { name: "Mysterious Rites", level: "strong", why: "8% Queen's Ritual: +Omenek és garantált Idol — a jackpot." },
+        { name: "Mysterious Rites", level: "strong", why: "8% Queen's Ritual: +favour, +10 Omen, garantált Idol — a jackpot." },
         { name: "Royal Tithe", level: "strong", why: "+15% Audience with the King progresszió." },
-        { name: "Reborn in Shadow", level: "nice", why: "Feltámasztott mobok +40% Magic/+40% Rare — tribute-forrás." },
+        { name: "Spreading Darkness", level: "strong", why: "A unique tárgyak típusa a ritual-típustól függ (Tainted → öv/charm/flask)." },
+        { name: "Invigorated Sacrifices", level: "strong", why: "Keystone: a 3. opció (toughness/dmg + -50% tribute büntetés) tribute-termelő." },
+        { name: "Reborn in Shadow", level: "nice", why: "Feltámasztott mobok +40% Magic / +40% Rare — tribute-forrás." },
+        { name: "Ancient Enmities", level: "nice", why: "+25% tribute a spirit-influenced/possessed moboktól." },
+        { name: "Prayer and Pledge", level: "nice", why: "Az elköltött tribute 10%-a King-progressziót is ad." },
+        { name: "From the Mists", level: "nice", why: "A rituálok +1 Wildwood szörny-packot tartalmaznak." },
+        { name: "Between Two Worlds", level: "nice", why: "Az altárok Wildwood Wispet is idéznek." },
+        { name: "Bring Forth the Unseen", level: "nice", why: "Altár 15% eséllyel summoning circle-ön épül → +boss." },
+        { name: "Umbral Gathering", level: "nice", why: "Rite of the Nameless map-opciók 20% eséllyel +1 modifier." },
+        { name: "Ongoing Chants", level: "nice", why: "A Rite of the Nameless +1 mapen át tart." },
+        { name: "Traveller's Woe", level: "nice", why: "Keystone (NEM waystone!): +100% adott ritual-típus (Tainted = övek)." },
       ],
       terms: [
-        { k: "Traveller's Woe", v: "Keystone (NEM waystone!): +100% esély adott ritual-típusra (Tainted = övek)." },
+        { k: "Audience with the King", v: "A ritual hosszú távú progressziója; a Royal Tithe / Prayer and Pledge gyorsítja." },
         { k: "Mageblood / Headhunter", v: "Öv-uniquek: Tainted ritual (öv-slot) + Hour of the Nameless / Spreading Darkness." },
+        { k: "Rite of the Nameless", v: "Speciális endgame ritual-szekvencia (Umbral Gathering / Ongoing Chants modolja)." },
       ],
     },
     {
       name: "Delirium",
-      sub: "a node-ok hátborzongató mondatok",
-      note: "A node-nevek tényleg ijesztő mondatok — ezek a valódi nevek! A 0.5 könnyített rajta (felezett unique toughness). Cél: vagy sűrűség, vagy jackpot (simulacrum / megalomaniac / fracturing mirror).",
+      sub: "a node-ok hátborzongató mondatok (ezek a valódi nevek!)",
+      note: "A 0.5 könnyített rajta (felezett unique toughness). Cél: vagy sűrűség (több mob a ködben), vagy jackpot (simulacrum / megalomaniac / fracturing mirror).",
       best: "Sűrűség: „You can't just wake up from this one.” + „These demons are all your own…” + „Get out of my head!” + „There's nowhere to hide…” + „You thought you were free?”  ·  Jackpot: „The mirrors… the mirrors!” + „Is that the best you've got?!” + „Is this about me… or you?”",
       nodes: [
+        { name: "„You can't just wake up from this one.”", level: "strong", why: "Sűrűség: a Delirium köd 30%-kal lassabban oszlik el." },
         { name: "„These demons are all your own…”", level: "strong", why: "Sűrűség: a rare mobok mindig delirium démonokat idéznek a ködben." },
-        { name: "„You can't just wake up from this one.”", level: "strong", why: "Sűrűség: a köd 30%-kal lassabban oszlik el." },
-        { name: "„There's nowhere to hide…”", level: "strong", why: "A köd mindig átterjed a simulacrumot körülvevő mapekre." },
+        { name: "„Get out of my head!”", level: "strong", why: "Sűrűség: a magic mobok 25% eséllyel +1 delirium modot kapnak." },
+        { name: "„There's nowhere to hide…”", level: "strong", why: "Sűrűség: a köd mindig átterjed a simulacrumot körülvevő mapekre." },
+        { name: "„You thought you were free?”", level: "strong", why: "Sűrűség: +25% simulacrum, amikor a köd Grand Mirrorból terjed." },
         { name: "„The mirrors… the mirrors!”", level: "strong", why: "Jackpot: +50% fracturing mirror a ködben." },
-        { name: "„Is this about me… or you?”", level: "strong", why: "Jackpot: simulacrum splinter 75+ mapeken; megalomaniac jewel 10% eséllyel 3 notable-t ad." },
+        { name: "„Is that the best you've got?!”", level: "strong", why: "Jackpot: +50% escalation shard a ködben." },
+        { name: "„Is this about me… or you?”", level: "strong", why: "Jackpot: simulacrum splinter 75+ mapen; megalomaniac jewel 10% eséllyel 3 notable." },
+        { name: "„I see your true nature now!”", level: "nice", why: "A köd shardokat hozhat: +boss a boss-arénához, vagy garantált Grand reward." },
+        { name: "„I'm not alone anymore!”", level: "nice", why: "Az Azmeri spiritek 10 mp-enként fracturing mirrort hoznak létre." },
+        { name: "„Come on! Face me!”", level: "nice", why: "+25% unique boss shard; unique-ölés 10 mp-re megállítja a mirror-timert." },
+        { name: "„Are you sure you want to do that?”", level: "nice", why: "A tabletek dupla hatással működnek Grand Mirror areán." },
+        { name: "„You can't scare me anymore!”", level: "nice", why: "Unique mobok potent emotiont dobnak (Melancholy / Ferocity / Contempt)." },
+        { name: "„I know your childhood fears…”", level: "nice", why: "+25% liquid emotion a moboktól; 20% eséllyel Ancient." },
         { name: "Recurring Nightmares", level: "nice", why: "Keystone: hogyan terjed a köd a Grand Mirrorból (pl. +4 map fixen)." },
       ],
       terms: [
         { k: "Liquid Emotion", v: "Melancholy / Ferocity / Contempt (a transcript „Velocity”-t mondott — az Ferocity). Tier: base → Potent → Ancient." },
         { k: "Megalomaniac", v: "Unique jewel a Simulacrumból (2–3 random notable passzívot ad)." },
+        { k: "Simulacrum", v: "300 splinter = 1 Simulacrum; a köd-farm fő jutalma." },
       ],
     },
   ],
