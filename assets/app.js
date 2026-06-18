@@ -61,6 +61,7 @@
     else if (type === "delirium") kids = [C({ cx: 12, cy: 12, r: 8, "stroke-dasharray": "3 3.4" }), C({ cx: 12, cy: 12, r: 3 })];
     else if (type === "boss") kids = [P({ points: "12,3 21,20 3,20" }), C({ cx: 9.2, cy: 15, r: 1, fill: "currentColor", stroke: "none" }), C({ cx: 14.8, cy: 15, r: 1, fill: "currentColor", stroke: "none" })];
     else if (type === "expedition") kids = [P({ points: "12,4 19,8 19,16 12,20 5,16 5,8" }), C({ cx: 12, cy: 12, r: 2.4 })];
+    else if (type === "atlas") kids = [L({ x1: 12, y1: 12, x2: 5, y2: 6 }), L({ x1: 12, y1: 12, x2: 19, y2: 7 }), L({ x1: 12, y1: 12, x2: 7, y2: 18 }), L({ x1: 12, y1: 12, x2: 18, y2: 17 }), C({ cx: 12, cy: 12, r: 2.4, fill: "currentColor", stroke: "none" }), C({ cx: 5, cy: 6, r: 1.8 }), C({ cx: 19, cy: 7, r: 1.8 }), C({ cx: 7, cy: 18, r: 1.8 }), C({ cx: 18, cy: 17, r: 1.8 })];
     var svg = svgEl("svg", { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 1.4, "stroke-linecap": "round", "stroke-linejoin": "round" });
     kids.forEach(function (k) { svg.appendChild(k); });
     return svg;
@@ -310,8 +311,68 @@
     );
   }
 
+  /* --- Atlas passzív fa nézet (új tartalomtípus) ------------------------- */
+  function renderAtlasTree(goal) {
+    var L = ATLAS.ui, LV = ATLAS.levels;
+    var sec = el("section", {},
+      el("div", { class: "rhead" },
+        el("span", { class: "rhead__glyph" }, glyph(goal.icon)),
+        el("div", { class: "rhead__main" },
+          el("div", { class: "rhead__title", text: goal.label }),
+          el("div", { class: "rhead__mech", text: goal.mech })
+        )
+      )
+    );
+    if (goal.patch) sec.appendChild(el("div", { class: "pills" }, pill("Patch", goal.patch)));
+    if (goal.intro) sec.appendChild(el("p", { class: "intro", text: goal.intro }));
+
+    sec.appendChild(el("div", { class: "combo-title" }, "Fő fa — ajánlott kezdés ", el("span", { class: "combo-title__note", text: "· sustain-first sorrend" })));
+    goal.steps.forEach(function (s, i) {
+      sec.appendChild(el("div", { class: "astep" },
+        el("span", { class: "astep__n", text: i + 1 }),
+        el("div", { class: "astep__body" },
+          el("div", { class: "astep__title", text: s.title }),
+          el("div", { class: "astep__detail", text: s.detail }),
+          s.nodes ? el("div", { class: "passives" }, s.nodes.map(function (n) { return el("span", { class: "passive", text: n }); })) : null
+        )
+      ));
+    });
+
+    sec.appendChild(el("div", { class: "combo-title combo-title--mt" }, "Mechanika-fák ", el("span", { class: "combo-title__note", text: "· külön Atlas fa mechanikánként" })));
+    goal.trees.forEach(function (t) {
+      var card = el("div", { class: "atree" },
+        el("div", { class: "atree__head" },
+          el("span", { class: "atree__name", text: t.name }),
+          t.sub ? el("span", { class: "atree__sub", text: t.sub }) : null
+        ),
+        t.note ? el("div", { class: "atree__note", text: t.note }) : null
+      );
+      if (t.best) card.appendChild(el("div", { class: "bestline" },
+        el("div", { class: "bestline__label", text: "Legerősebb vonal" }),
+        el("div", { class: "bestline__text", text: t.best })
+      ));
+      if (t.nodes) card.appendChild(el("div", { class: "mods__list" }, t.nodes.map(function (m) {
+        return el("div", { class: "mod" },
+          el("div", { class: "mod__row" },
+            el("div", { class: "mod__name", text: m.name }),
+            el("span", { class: "mod__badge lvl-c--" + m.level, text: LV[m.level] || m.level })
+          ),
+          el("div", { class: "mod__why", text: m.why })
+        );
+      })));
+      if (t.terms) card.appendChild(el("div", { class: "termlist" }, t.terms.map(function (tm) {
+        return el("div", { class: "term" }, el("span", { class: "term__k", text: tm.k + ":" }), el("span", { text: tm.v }));
+      })));
+      sec.appendChild(card);
+    });
+
+    sec.appendChild(videoCta(goal));
+    return sec;
+  }
+
   function renderContent() {
     var goal = currentGoal();
+    if (goal.type === "atlastree") return renderAtlasTree(goal);
     if (goal.type === "delirium") return renderDelirium(goal);
     if (goal.type === "stub") return renderStub(goal);
     return renderRecipe(goal);

@@ -322,3 +322,23 @@ a { color: inherit; }
 .site-footer { margin-top: 38px; padding: 18px 0 0; border-top: 1px solid var(--line-soft); display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: #5f5a50; }
 .site-footer__note { max-width: 640px; line-height: 1.5; }
 .site-footer__ver { font-family: var(--font-mono); white-space: nowrap; }
+
+/* ----- Atlas Passzív Fa nézet (type: atlastree) ------------------------- */
+.combo-title--mt { margin-top: 24px; }
+.astep { display: flex; gap: 13px; background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 14px 16px; margin-bottom: 10px; }
+.astep__n { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; background: rgba(203,169,104,.12); border: 1px solid rgba(203,169,104,.3); color: var(--gold-bright); font-family: var(--font-head); font-weight: 700; font-size: 15px; }
+.astep__body { flex: 1; min-width: 0; }
+.astep__title { font-weight: 600; font-size: 14.5px; color: var(--text); margin-bottom: 3px; }
+.astep__detail { font-size: 13px; color: var(--muted-2); line-height: 1.55; }
+.astep .passives { margin-top: 10px; }
+.atree { background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 15px 16px; margin-bottom: 12px; }
+.atree__head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.atree__name { font-family: var(--font-head); font-weight: 700; font-size: 17px; color: var(--text); letter-spacing: .01em; }
+.atree__sub { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.atree__note { font-size: 13px; color: var(--muted-2); line-height: 1.6; margin-bottom: 12px; }
+.bestline { background: linear-gradient(180deg, rgba(203,169,104,.1), rgba(203,169,104,.03)); border: 1px solid rgba(203,169,104,.26); border-left: 3px solid var(--gold); border-radius: 11px; padding: 11px 14px; margin-bottom: 12px; }
+.bestline__label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+.bestline__text { font-size: 13px; color: #e7dcc2; line-height: 1.6; }
+.termlist { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+.term { font-size: 12.5px; line-height: 1.5; color: var(--muted-2); }
+.term__k { font-family: var(--font-mono); color: var(--gold); font-size: 11.5px; margin-right: 6px; }
