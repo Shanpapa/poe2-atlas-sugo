@@ -29,7 +29,7 @@ window.ATLAS = {
     // A fejléc jobb oldali linkje (a készítő csatornája/videója).
     credit: { label: "Dartagnan videója", url: "https://youtu.be/b5hJUpY9S5E" },
 
-    footerNote:    "Nem hivatalos, közösségi segédlet — nincs kapcsolat a Grinding Gear Games-szel. Eredeti, ihletett art; nem tartalmaz hivatalos PoE2 assetet.",
+    footerNote:    "Nem hivatalos, funmade segédlet — nincs kapcsolat a Grinding Gear Games-szel. Eredeti, ihletett art; nem tartalmaz hivatalos PoE2 assetet.",
     footerVersion: "v0 · demó",
   },
 
@@ -55,7 +55,7 @@ window.ATLAS = {
     stubBadge:      "Hamarosan",
 
     videoCtaTitle: "Nézd meg a videóban",
-    videoCtaSub:   "Ez a recept Dartagnan végigjátszásából készült — itt a teljes, részletes magyarázat.",
+    videoCtaSub:   "Ez a recept Dartagnan videója alapján készült — itt a teljes, részletes magyarázat.",
   },
 
   // A mod-fontossági címkék (a "Keresd ezeket" listában a kis színes jelvény).
@@ -139,7 +139,7 @@ window.ATLAS = {
           map: "City map (4 slot) + Grand Mirror 200% Delirium",
           waystone: "T15+ · 6+ mod",
           mapcraft: "6 modra craftolva, Omennel erősítve, majd korruptálva (ideál 8 mod, de 6 is jó). T16 csak ha az area level 81 → ilvl 82.",
-          passives: ["partial translations", "unforcing threads", "unexpected mission"],
+          passives: ["partial translations", "unforeseen threats", "unexpected mission"],
           tablets: [
             { qty: "4×", name: "Abyss tablet", note: "ebből 2 cserélhető költségcsökkentésre" },
           ],
@@ -200,7 +200,7 @@ window.ATLAS = {
           map: "City map (4 slot) + Grand Mirror 200% Delirium",
           waystone: "T15+ · 6–8 mod · high rarity + effectiveness",
           mapcraft: "6–8 modra előkészítve, high rarity és effectiveness fókusszal.",
-          passives: ["partial translations", "unforcing threads", "unexpected mission"],
+          passives: ["partial translations", "unforeseen threats", "unexpected mission"],
           tablets: [
             { qty: "3×", name: "Breach tablet", note: "„+3 rare on stabilise”" },
             { qty: "1×", name: "Unique Breach tablet" },
@@ -236,9 +236,9 @@ window.ATLAS = {
           map: "T15 · 6+ mod · area level 79+",
           waystone: "T15 · 6+ mod",
           mapcraft: "Area level 79+ kötelező az Omen of Whittlinghez.",
-          passives: ["partial translations", "unforcing threads", "unexpected mission"],
+          passives: ["partial translations", "unforeseen threats", "unexpected mission"],
           tablets: [
-            { qty: "1×", name: "Freedom of Fate", note: "unique" },
+            { qty: "1×", name: "Freedom of Faith", note: "unique" },
             { qty: "2×", name: "Ritual tablet", note: "+3 favour reroll" },
             { qty: "1×", name: "Ritual tablet", note: "2 hasznos mod" },
           ],
@@ -247,9 +247,9 @@ window.ATLAS = {
             { name: "Increased tribute",          why: "a Ritual saját valutája — mindent felhúz.",            level: "mandatory" },
             { name: "Increased omen spawn chance", why: "omen jön az unique helyett; hosszú távon óriási.",     level: "strong" },
             { name: "Reduced defer cost",         why: "a drága rewardot életben tartod a poolban.",           level: "strong" },
-            { name: "Freedom of Fate (unique tablet)", why: "megemeli a jutalmak értékét.",                    level: "nice" },
+            { name: "Freedom of Faith (unique tablet)", why: "megemeli a jutalmak értékét.",                    level: "nice" },
           ],
-          keep:  ["Freedom of Fate tablet"],
+          keep:  ["Freedom of Faith tablet"],
           sell:  ["ritka, nagy értékű omenek (ez a jackpot)"],
           avoid: ["area level < 79 → nincs drága omen"],
           warn:  "A Delirium itt indirekt: több mob → több tribute → több reroll → omen. Kevésbé stabil, de nagy a jackpot.",
@@ -288,7 +288,7 @@ window.ATLAS = {
       type: "stub",
       videoSeconds: 362,
       videoTime: "6:02",
-      note: "Teljesen más atlas fa: a cél nem a több mob, hanem a jobb boss-drop és a gyorsabb boss-elérés (Pinnacle bossok, speciális encounterök). A részletes setupot a készítő nem ebben a videóban adja — ez itt placeholder a teljességhez.",
+      note: "Teljesen más atlas fa: a cél nem a több mob, hanem a jobb boss-drop és a gyorsabb boss-elérés (Pinnacle bossok, speciális encounterök). A részletes setupot Dartagnan nem ebben a videóban adja — ez itt placeholder a teljességhez.",
     },
 
     /* ===== 6) EXPEDITION (placeholder) ===== */
@@ -300,7 +300,7 @@ window.ATLAS = {
       type: "stub",
       videoSeconds: 310,
       videoTime: "5:10",
-      note: "A Return of the Ancients egyik legnagyobb nyertese — a craft- és runa-gyűjtők iránya. A készítő külön videóra tolta, így itt egyelőre csak placeholder szerepel.",
+      note: "A Return of the Ancients egyik legnagyobb nyertese — a craft- és runa-gyűjtők iránya. Dartagnan külön videóra tolta, így itt egyelőre csak placeholder szerepel.",
     },
 
   ],
