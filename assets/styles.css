@@ -358,11 +358,8 @@ a { color: inherit; }
 .atlas-scene { display: block; width: 100%; max-width: 1180px; margin: 0 auto; height: auto; }
 .atlas-med { cursor: pointer; transition: filter .2s; }
 .atlas-med:hover { filter: drop-shadow(0 0 15px rgba(203,169,104,.5)); }
-.atlas-focus { display: flex; gap: clamp(18px,4vw,44px); align-items: flex-start; flex-wrap: wrap; max-width: 1060px; margin: 0 auto; }
-.atlas-focus__viz { flex: 1 1 360px; min-width: 280px; display: flex; justify-content: center; }
-.atlas-focus__panel { flex: 1 1 380px; min-width: 300px; }
-.atlas-constellation { display: block; width: 100%; max-width: 600px; }
-.atlas-node { cursor: pointer; }
+.atlas-focus { max-width: 760px; margin: 0 auto; }
+.atlas-focus__panel { width: 100%; }
 .atlas-panel__head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .atlas-panel__name { font-family: var(--font-head); font-weight: 700; font-size: 25px; letter-spacing: .03em; color: #f0ead9; }
 .atlas-panel__sub { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
