@@ -313,12 +313,18 @@
     );
   }
 
-  /* --- Atlas passzív fa: áttekintő (5 kategória + fő fa) + szöveges fókusz ---
-     A node-konstelláció ábrákat szándékosan kivettük — nem reprezentálták az
-     ingame node-rendszert. A valódi node-ábrázolás később jön. */
+  /* --- Atlas passzív fa: áttekintő (node-ábrás emblémák) + szöveges fókusz ---
+     Az ÁTTEKINTŐN maradnak a kis node-ábrás emblémák (jól mutatnak). A
+     FÓKUSZÁLT (mechanika-) nézetből kivettük a nagy, címkézett konstellációt —
+     ott csak a szöveges panel van. A valódi node-ábrázolás később jön. */
   var atlasUid = 0;
   function auid() { return "ag" + (++atlasUid); }
   function svgText(attrs, str) { var t = svgEl("text", attrs); t.textContent = str; return t; }
+  function atlasLvl(level) {
+    if (level === "mandatory") return { c: "#e7c987", glow: "rgba(231,201,135,.8)" };
+    if (level === "strong") return { c: "#bcabe8", glow: "rgba(188,171,232,.5)" };
+    return { c: "#8a8578", glow: "rgba(138,133,120,.3)" };
+  }
   function atlasIcon(name) {
     if (/Ritual/i.test(name)) return "❇";
     if (/Delirium/i.test(name)) return "◈";
@@ -327,7 +333,19 @@
     if (/Temple/i.test(name)) return "△";
     return "◆";
   }
+  function atlasRng(seed) {
+    var s = seed >>> 0;
+    return function () { s = (s + 0x6D2B79F5) >>> 0; var t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function atlasSeed(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function ringPos(i, n, r, cx, cy, start) { var a = (start == null ? -Math.PI / 2 : start) + (i / Math.max(1, n)) * Math.PI * 2; return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
   function findTree(goal, name) { for (var i = 0; i < goal.trees.length; i++) if (goal.trees[i].name === name) return goal.trees[i]; return null; }
+  function keyNodes(tree) {
+    var key = tree.nodes.filter(function (n) { return n.level !== "nice"; });
+    if (key.length < 3) key = tree.nodes.slice(0, Math.min(4, tree.nodes.length));
+    if (key.length > 7) key = key.slice(0, 7);
+    return key;
+  }
 
   function stoneDefs(id) {
     var g = svgEl("radialGradient", { id: id, cx: "50%", cy: "40%", r: "68%" });
@@ -341,7 +359,7 @@
     var out = [];
     out.push(svgEl("circle", { cx: cx, cy: cy, r: r, fill: "url(#" + gradId + ")", stroke: accent, "stroke-width": 2.5 }));
     out.push(svgEl("circle", { cx: cx, cy: cy, r: r - 7, fill: "none", stroke: "rgba(203,169,104,.18)", "stroke-width": 1 }));
-    out.push(svgEl("circle", { cx: cx, cy: cy, r: r * 0.78, fill: "none", stroke: "rgba(255,255,255,.05)", "stroke-width": 1, "stroke-dasharray": "2 6" }));
+    out.push(svgEl("circle", { cx: cx, cy: cy, r: r * 0.8, fill: "none", stroke: "rgba(255,255,255,.05)", "stroke-width": 1, "stroke-dasharray": "2 6" }));
     var ticks = 48;
     for (var i = 0; i < ticks; i++) {
       var a = (i / ticks) * Math.PI * 2, r1 = r - 2.5, r2 = r - (i % 4 === 0 ? 9 : 5.5);
@@ -355,30 +373,66 @@
       svgEl("polygon", { points: triPoints(cx, cy, r - 9), fill: "none", stroke: "rgba(203,169,104,.18)", "stroke-width": 1, "stroke-linejoin": "round" })
     ];
   }
+  function backdrop(cx, cy, r, seed) {
+    var out = [], rnd = atlasRng(seed), n = 22, pts = [];
+    for (var i = 0; i < n; i++) { var a = rnd() * Math.PI * 2, rr = (0.25 + rnd() * 0.6) * r; pts.push({ x: cx + rr * Math.cos(a), y: cy + rr * Math.sin(a) }); }
+    for (var j = 0; j < n; j++) { var k = (j + 1 + Math.floor(rnd() * 3)) % n; out.push(svgEl("line", { x1: pts[j].x, y1: pts[j].y, x2: pts[k].x, y2: pts[k].y, stroke: "rgba(203,169,104,.07)", "stroke-width": 0.6 })); }
+    for (var m = 0; m < n; m++) out.push(svgEl("circle", { cx: pts[m].x, cy: pts[m].y, r: 1.3, fill: "rgba(203,169,104,.13)" }));
+    return out;
+  }
+  function nodeDot(parent, x, y, rad, level, glow) {
+    var Lc = atlasLvl(level);
+    parent.appendChild(svgEl("circle", { cx: x, cy: y, r: rad + 3, fill: "none", stroke: Lc.c, "stroke-width": 1, opacity: 0.35 }));
+    var c = svgEl("circle", { cx: x, cy: y, r: rad, fill: Lc.c, opacity: level === "nice" ? 0.55 : 0.95 });
+    if (glow || level === "mandatory") c.setAttribute("style", "filter:drop-shadow(0 0 4px " + Lc.glow + ")");
+    parent.appendChild(c);
+  }
 
-  // Tiszta embléma: ornamentált keret + ikon + név (NINCS fals node-ábra)
-  function emblem(cx, cy, r, isTri, icon, iconSize, name, nameSize, sub, onClick) {
+  function medallionGroup(tree, cx, cy, r) {
     var g = svgEl("g", { class: "atlas-med" });
     var gid = auid(); g.appendChild(stoneDefs(gid));
-    (isTri ? frameTriangle(cx, cy, r, gid, "rgba(150,120,80,.55)") : frameCircle(cx, cy, r, gid, "rgba(150,120,80,.55)")).forEach(function (e) { g.appendChild(e); });
-    var iconY = isTri ? cy + r * 0.08 : cy;
-    g.appendChild(svgText({ x: cx, y: iconY + iconSize * 0.34, "text-anchor": "middle", "font-size": String(iconSize), fill: "#e7c987", "font-family": "'JetBrains Mono',monospace", style: "filter:drop-shadow(0 0 8px rgba(231,201,135,.4))" }, icon));
-    var labelY = (isTri ? cy + r * 0.62 : cy + r) + 26;
-    g.appendChild(svgText({ x: cx, y: labelY, "text-anchor": "middle", fill: "#f0ead9", "font-family": "'Cinzel',serif", "font-weight": "700", "font-size": String(nameSize), "letter-spacing": "1.4" }, name));
-    if (sub) g.appendChild(svgText({ x: cx, y: labelY + 16, "text-anchor": "middle", fill: "#857f6e", "font-family": "'JetBrains Mono',monospace", "font-size": "10.5" }, sub));
-    g.addEventListener("click", onClick);
+    var isTri = /Temple/i.test(tree.name), accent = "rgba(150,120,80,.55)";
+    (isTri ? frameTriangle(cx, cy, r, gid, accent) : frameCircle(cx, cy, r, gid, accent)).forEach(function (e) { g.appendChild(e); });
+    backdrop(cx, cy, r, atlasSeed(tree.name)).forEach(function (e) { g.appendChild(e); });
+    var key = keyNodes(tree), ring = key.slice(1), rr = (isTri ? 0.5 : 0.62) * r;
+    ring.forEach(function (nd, i) {
+      var p = ringPos(i, ring.length, rr, cx, cy, -Math.PI / 2 + 0.3), Lc = atlasLvl(nd.level);
+      g.appendChild(svgEl("line", { x1: cx, y1: cy, x2: p.x, y2: p.y, stroke: Lc.c, "stroke-width": nd.level === "mandatory" ? 1.6 : 1.1, opacity: nd.level === "mandatory" ? 0.8 : 0.4 }));
+    });
+    ring.forEach(function (nd, i) { var p = ringPos(i, ring.length, rr, cx, cy, -Math.PI / 2 + 0.3); nodeDot(g, p.x, p.y, nd.level === "nice" ? 3.2 : 4.2, nd.level, false); });
+    nodeDot(g, cx, cy, 7, (key[0] || {}).level || "strong", true);
+    var labelY = (isTri ? cy + r * 0.6 : cy + r) + 26;
+    g.appendChild(svgText({ x: cx, y: labelY, "text-anchor": "middle", fill: "#e1d9c6", "font-family": "'Cinzel',serif", "font-weight": "700", "font-size": "16", "letter-spacing": "1.2" }, tree.name));
+    g.appendChild(svgText({ x: cx, y: labelY + 16, "text-anchor": "middle", fill: "#857f6e", "font-family": "'JetBrains Mono',monospace", "font-size": "10.5" }, tree.sub || ""));
+    g.addEventListener("click", function () { state.atlasView = tree.name; state.atlasSel = null; render(); });
+    return g;
+  }
+  function mainMedallionGroup(goal, cx, cy, r) {
+    var g = svgEl("g", { class: "atlas-med" });
+    var gid = auid(); g.appendChild(stoneDefs(gid));
+    frameCircle(cx, cy, r, gid, "rgba(150,120,80,.55)").forEach(function (e) { g.appendChild(e); });
+    backdrop(cx, cy, r, atlasSeed("MAIN")).forEach(function (e) { g.appendChild(e); });
+    var steps = goal.steps, n = steps.length, top = cy - r * 0.72, span = r * 1.44;
+    var pts = steps.map(function (s, i) { return { x: cx + r * 0.5 * Math.sin(i * 0.95), y: top + (i / (n - 1)) * span, n: i + 1 }; });
+    var path = pts.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+    g.appendChild(svgEl("polyline", { points: path, fill: "none", stroke: "rgba(231,201,135,.2)", "stroke-width": 7, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    g.appendChild(svgEl("polyline", { points: path, fill: "none", stroke: "#e7c987", "stroke-width": 2.5, "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-dasharray": "1 8", style: "animation:atlasDash 1.4s linear infinite;filter:drop-shadow(0 0 5px rgba(231,201,135,.65))" }));
+    pts.forEach(function (p) {
+      g.appendChild(svgEl("circle", { cx: p.x, cy: p.y, r: 9, fill: "#15140f", stroke: "#e7c987", "stroke-width": 1.5, style: "filter:drop-shadow(0 0 4px rgba(231,201,135,.5))" }));
+      g.appendChild(svgText({ x: p.x, y: p.y + 3.2, "text-anchor": "middle", "font-size": "9.5", "font-weight": "700", fill: "#e7c987", "font-family": "'JetBrains Mono',monospace" }, String(p.n)));
+    });
+    g.appendChild(svgText({ x: cx, y: cy + r + 28, "text-anchor": "middle", fill: "#f0ead9", "font-family": "'Cinzel',serif", "font-weight": "700", "font-size": "19", "letter-spacing": "2" }, "FŐ ATLAS-FA"));
+    g.appendChild(svgText({ x: cx, y: cy + r + 46, "text-anchor": "middle", fill: "#9a9277", "font-family": "'JetBrains Mono',monospace", "font-size": "11" }, "sustain-first · 1 → 10 · kezdd itt"));
+    g.addEventListener("click", function () { state.atlasView = "main"; state.atlasSel = null; render(); });
     return g;
   }
   function atlasOverview(goal) {
-    var svg = svgEl("svg", { class: "atlas-scene", viewBox: "0 0 1200 880", preserveAspectRatio: "xMidYMid meet" });
-    var main = { x: 600, y: 290, r: 150 };
-    var sat = { "Ritual": { x: 180, y: 350, r: 90 }, "Vaal Temple": { x: 1020, y: 350, r: 96 }, "Delirium": { x: 320, y: 670, r: 90 }, "Breach": { x: 600, y: 700, r: 90 }, "Abyss": { x: 880, y: 670, r: 90 } };
+    var svg = svgEl("svg", { class: "atlas-scene", viewBox: "0 0 1200 920", preserveAspectRatio: "xMidYMid meet" });
+    var main = { x: 600, y: 300, r: 178 };
+    var sat = { "Ritual": { x: 168, y: 360, r: 96 }, "Vaal Temple": { x: 1032, y: 360, r: 104 }, "Delirium": { x: 300, y: 720, r: 96 }, "Breach": { x: 600, y: 752, r: 96 }, "Abyss": { x: 900, y: 720, r: 96 } };
     Object.keys(sat).forEach(function (name) { var s = sat[name]; svg.appendChild(svgEl("line", { x1: main.x, y1: main.y, x2: s.x, y2: s.y, stroke: "rgba(203,169,104,.14)", "stroke-width": 1.2, "stroke-dasharray": "2 5" })); });
-    goal.trees.forEach(function (t) {
-      var s = sat[t.name]; if (!s) return;
-      svg.appendChild(emblem(s.x, s.y, s.r, /Temple/i.test(t.name), atlasIcon(t.name), 26, t.name, 15, t.sub || "", function () { state.atlasView = t.name; state.atlasSel = null; render(); }));
-    });
-    svg.appendChild(emblem(main.x, main.y, main.r, false, "◆", 34, "FŐ ATLAS-FA", 19, "sustain-first · 1 → 10 · kezdd itt", function () { state.atlasView = "main"; state.atlasSel = null; render(); }));
+    goal.trees.forEach(function (t) { var s = sat[t.name]; if (s) svg.appendChild(medallionGroup(t, s.x, s.y, s.r)); });
+    svg.appendChild(mainMedallionGroup(goal, main.x, main.y, main.r));
     return svg;
   }
 
