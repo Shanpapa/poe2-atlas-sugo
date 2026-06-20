@@ -340,6 +340,17 @@
   function atlasSeed(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function ringPos(i, n, r, cx, cy, start) { var a = (start == null ? -Math.PI / 2 : start) + (i / Math.max(1, n)) * Math.PI * 2; return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
   function findTree(goal, name) { for (var i = 0; i < goal.trees.length; i++) if (goal.trees[i].name === name) return goal.trees[i]; return null; }
+  // poe2db deep-link a node-hoz. Tiszta neveknél direkt oldal; mondat-szerű vagy
+  // bizonytalan (?) neveknél Google-keresés fallback (hogy ne legyen törött link).
+  function poe2dbUrl(name) {
+    var n = String(name).trim();
+    // Tiszta angol node-név (betű/szám/szóköz/aposztróf/kötőjel) → direkt poe2db oldal
+    // (az aposztróf KELL, pl. Traveller's_Woe).
+    if (/^[A-Za-z0-9 '\-]+$/.test(n)) return "https://poe2db.tw/us/" + encodeURI(n.replace(/ /g, "_"));
+    // Mondat-szerű / bizonytalan (?) / idézőjeles név → Google-keresés (nincs törött link).
+    var clean = n.replace(/[„""''‚‘’.…!?:,()]/g, "").replace(/\s+/g, " ").trim();
+    return "https://www.google.com/search?q=" + encodeURIComponent("poe2db PoE2 " + clean);
+  }
   function keyNodes(tree) {
     var key = tree.nodes.filter(function (n) { return n.level !== "nice"; });
     if (key.length < 3) key = tree.nodes.slice(0, Math.min(4, tree.nodes.length));
@@ -456,7 +467,8 @@
         el("div", { class: "atlas-noderow__top" },
           el("span", { class: "atlas-noderow__dot lc-" + nd.level }),
           el("span", { class: "atlas-noderow__name", text: nd.name }),
-          el("span", { class: "mod__badge lvl-c--" + nd.level, text: LV[nd.level] || nd.level })
+          el("span", { class: "mod__badge lvl-c--" + nd.level, text: LV[nd.level] || nd.level }),
+          el("a", { class: "atlas-noderow__link", href: poe2dbUrl(nd.name), target: "_blank", rel: "noopener", onclick: function (e) { e.stopPropagation(); }, text: "poe2db ↗" })
         ),
         el("div", { class: "atlas-noderow__why", text: nd.why })
       ));
