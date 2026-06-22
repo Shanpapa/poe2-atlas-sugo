@@ -81,16 +81,6 @@
 
       {
         kind: "callout",
-        tone: "warn",
-        icon: "⚠",
-        title: "Két pontosítás a képekről",
-        items: [
-          "Igen, a tabletek a 0.5-ben rare-ré craftolhatók — a régi „csak Normal/Magic” infó elavult.",
-        ],
-      },
-
-      {
-        kind: "callout",
         tone: "info",
         icon: "◈",
         title: "Szűrés a kupacban (regex-ötlet) + mit tarts",
