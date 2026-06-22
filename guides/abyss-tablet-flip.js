@@ -46,7 +46,7 @@
 
       {
         kind: "tiers",
-        label: "Mod-kombók értéke (a jegyzeted árai alapján)",
+        label: "Mod-kombók értéke",
         hint: "d = Divine Orb (prémium) · ex = Exalted · 1 Divine ≫ 1 Exalted · az árak ingadoznak",
         items: [
           { tier: "S", name: "additional map mods + 4 abyss chance", price: "18–25 d" },
@@ -71,7 +71,7 @@
 
       {
         kind: "prose",
-        label: "Miért fial ez? — a két kép együtt",
+        label: "Miért fial ez?",
         paras: [
           "Kereslet: az Abyss most az egyik legjobb currency-farm. A 0.5.3 garantált Desecrated Currency-t adott az Abyssal Depths bossaitól/ládáitól (Vandroth, a nagy Abyssal Trove). Akkora ugrás, hogy Kulemak invitációja 5–7 Exaltedről ~245 Exaltedre ugrott. Mellé Abyss Jewel-ök (Heart of the Well), Stygian Vise öv, Omen of Light, Divine-ok. → Mindenki Abyss-t futtat → óriási a kereslet a tabletekre (innen a ~70ex bázisár).",
           "Craft-modell: a bázis + rollozás költsége eltörpül az eladási ár mellett. A rare-ré craftoláshoz feloldás kell („Reverse Transcription”), ezért a magas-modos darabok ritkák → prémiumért mennek (a 3-affixos már 30+ Exalted; a jó kombók 9–26 Divine — pont ezt látod az eladási előzményekben).",
@@ -85,8 +85,7 @@
         icon: "⚠",
         title: "Két pontosítás a képekről",
         items: [
-          "A „Herald of Thunder – 2099 Exalted” (kékes szöveg) szinte biztosan NEM tablet, hanem egy gem-eladás, ami belekeveredett a Sales History feedbe — ne ez alapján kalibrálj.",
-          "Igen, a tabletek a 0.5-ben rare-ré craftolhatók (a képeken pont ilyenek) — a régi „csak Normal/Magic” infó elavult.",
+          "Igen, a tabletek a 0.5-ben rare-ré craftolhatók — a régi „csak Normal/Magic” infó elavult.",
         ],
       },
 
