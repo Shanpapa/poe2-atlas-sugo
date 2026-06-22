@@ -4,8 +4,8 @@
    Önregisztráló guide: a window.ATLAS.goals listához adja magát.
    Típus: "guide" (generikus blokk-renderer az app.js-ben).
    UI magyar, ingame nevek angolul. Patch 0.5.x (Return of the Ancients).
-   Forrás: a sessionben összeszedett + verifikált infók (Maxroll, PoE2 wiki,
-   0.5.3 patch notes). EZT a fájlt nyugodtan szerkeszd — csak adat.
+   Forrás: Maxroll, PoE2 wiki, 0.5.3 patch notes.
+   EZT a fájlt nyugodtan szerkeszd — csak adat.
    ========================================================================== */
 (function () {
   if (!window.ATLAS || !window.ATLAS.goals) return;

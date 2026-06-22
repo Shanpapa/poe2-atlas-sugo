@@ -4,8 +4,7 @@
    Önregisztráló guide: a window.ATLAS.goals listához adja magát.
    Típus: "guide" (generikus blokk-renderer az app.js-ben).
    UI magyar, ingame nevek angolul. Patch 0.5.x (Return of the Ancients).
-   Forrás: a felhasználó in-game piaci képei + jegyzete (abyss tablets.txt) +
-   verifikált web (Maxroll, Sportskeeda, timesaver, 0.5.3 patch notes).
+   Forrás: Maxroll, Sportskeeda, timesaver, 0.5.3 patch notes.
    d = Divine Orb (prémium), ex = Exalted Orb. EZT a fájlt nyugodtan szerkeszd.
    ========================================================================== */
 (function () {
@@ -74,7 +73,7 @@
         label: "Miért fial ez?",
         paras: [
           "Kereslet: az Abyss most az egyik legjobb currency-farm. A 0.5.3 garantált Desecrated Currency-t adott az Abyssal Depths bossaitól/ládáitól (Vandroth, a nagy Abyssal Trove). Akkora ugrás, hogy Kulemak invitációja 5–7 Exaltedről ~245 Exaltedre ugrott. Mellé Abyss Jewel-ök (Heart of the Well), Stygian Vise öv, Omen of Light, Divine-ok. → Mindenki Abyss-t futtat → óriási a kereslet a tabletekre (innen a ~70ex bázisár).",
-          "Craft-modell: a bázis + rollozás költsége eltörpül az eladási ár mellett. A rare-ré craftoláshoz feloldás kell („Reverse Transcription”), ezért a magas-modos darabok ritkák → prémiumért mennek (a 3-affixos már 30+ Exalted; a jó kombók 9–26 Divine — pont ezt látod az eladási előzményekben).",
+          "Craft-modell: a bázis + rollozás költsége eltörpül az eladási ár mellett. A rare-ré craftoláshoz feloldás kell („Reverse Transcription”), ezért a magas-modos darabok ritkák → prémiumért mennek (a 3-affixos már 30+ Exalted; a jó kombók 9–26 Divine).",
           "Miért pont EZEK a modok: az „additional random Modifiers” még extra map-modokat is rárak (mindent felszoroz), az „Effectiveness” pedig egyszerre dobja meg az összes többit. A vásárló EGY tabletben akar több juicing-hatást — ezért ér a 2–3 modos kombó jóval többet, mint a modok külön-külön.",
         ],
       },
@@ -83,7 +82,7 @@
         kind: "callout",
         tone: "info",
         icon: "◈",
-        title: "Szűrés a kupacban (regex-ötlet) + mit tarts",
+        title: "Szűrés a kupacban (regex) + mit tarts",
         items: [
           "A legritkább, legértékesebb single-modokat szűrd külön / utoljára (ritkák, könnyű egyenként ellenőrizni).",
           "A gyakori „decent” modokat (pack size, rarity, rare monsters) rostáld ki elsőként.",
