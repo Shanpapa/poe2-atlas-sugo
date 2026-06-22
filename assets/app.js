@@ -56,6 +56,8 @@
     function C(a) { return svgEl("circle", a); }
     function L(a) { return svgEl("line", a); }
     function P(a) { return svgEl("polygon", a); }
+    function R(a) { return svgEl("rect", a); }
+    function PL(a) { return svgEl("polyline", a); }
     var kids = [];
     if (type === "currency") kids = [C({ cx: 12, cy: 12, r: 8 }), C({ cx: 12, cy: 12, r: 3.2 })];
     else if (type === "breach") kids = [L({ x1: 12, y1: 3, x2: 12, y2: 21 }), L({ x1: 3, y1: 12, x2: 21, y2: 12 }), L({ x1: 6, y1: 6, x2: 18, y2: 18 }), L({ x1: 18, y1: 6, x2: 6, y2: 18 })];
@@ -64,6 +66,8 @@
     else if (type === "boss") kids = [P({ points: "12,3 21,20 3,20" }), C({ cx: 9.2, cy: 15, r: 1, fill: "currentColor", stroke: "none" }), C({ cx: 14.8, cy: 15, r: 1, fill: "currentColor", stroke: "none" })];
     else if (type === "expedition") kids = [P({ points: "12,4 19,8 19,16 12,20 5,16 5,8" }), C({ cx: 12, cy: 12, r: 2.4 })];
     else if (type === "atlas") kids = [L({ x1: 12, y1: 12, x2: 5, y2: 6 }), L({ x1: 12, y1: 12, x2: 19, y2: 7 }), L({ x1: 12, y1: 12, x2: 7, y2: 18 }), L({ x1: 12, y1: 12, x2: 18, y2: 17 }), C({ cx: 12, cy: 12, r: 2.4, fill: "currentColor", stroke: "none" }), C({ cx: 5, cy: 6, r: 1.8 }), C({ cx: 19, cy: 7, r: 1.8 }), C({ cx: 7, cy: 18, r: 1.8 }), C({ cx: 18, cy: 17, r: 1.8 })];
+    else if (type === "mapping") kids = [PL({ points: "4,18 9,10 14,15 20,6", fill: "none" }), C({ cx: 4, cy: 18, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 9, cy: 10, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 14, cy: 15, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 20, cy: 6, r: 1.6, fill: "currentColor", stroke: "none" })];
+    else if (type === "tablet") kids = [R({ x: 5, y: 3.5, width: 14, height: 17, rx: 2.6 }), P({ points: "12,8.5 15.2,12 12,15.5 8.8,12" }), C({ cx: 12, cy: 12, r: 1, fill: "currentColor", stroke: "none" })];
     var svg = svgEl("svg", { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 1.4, "stroke-linecap": "round", "stroke-linejoin": "round" });
     kids.forEach(function (k) { svg.appendChild(k); });
     return svg;
@@ -523,10 +527,185 @@
     return sec;
   }
 
+  /* --- Guide nézet (type: "guide") — generikus blokk-renderer ------------
+     A blokk-alapú kezdő referencia-lapok motorja. Egy goal `blocks[]` tömböt
+     ad meg; minden blokknak van egy `kind`-je. Új blokktípushoz: új ág a
+     renderGuideBlock()-ban + (ha kell) minimális CSS a styles.css végén. */
+  function gLabel(text, hint) {
+    if (!text) return null;
+    return el("div", { class: "gblock__head" },
+      el("span", { class: "gblock__label", text: text }),
+      hint ? el("span", { class: "gblock__hint", text: hint }) : null
+    );
+  }
+  function guideSlotboard(b) {
+    var col = el("div", { class: "slotboard__col" });
+    col.appendChild(el("div", { class: "slot slot--way" },
+      el("span", { class: "slot__ic", text: "▣" }),
+      el("div", { class: "slot__main" },
+        el("div", { class: "slot__title", text: b.waystone.title }),
+        el("div", { class: "slot__sub", text: b.waystone.sub })
+      )
+    ));
+    (b.tablets || []).forEach(function (t) {
+      col.appendChild(el("div", { class: "slot slot--tab" },
+        el("span", { class: "slot__ic", text: "◈" }),
+        el("div", { class: "slot__main" },
+          el("div", { class: "slot__title", text: t.title }),
+          el("div", { class: "slot__sub", text: t.sub })
+        )
+      ));
+    });
+    var board = el("div", { class: "slotboard" },
+      col,
+      el("div", { class: "slotboard__arrow", text: "→" }),
+      el("div", { class: "slot slot--result" },
+        el("div", { class: "slot__title", text: b.result.title }),
+        el("div", { class: "slot__sub", text: b.result.sub })
+      )
+    );
+    var wrap = el("div", {}, board);
+    if (b.myth) wrap.appendChild(el("div", { class: "mythstrip" },
+      el("span", { class: "mythstrip__ic", text: "⚠" }),
+      el("div", {}, el("span", { class: "mythstrip__t", text: b.myth.title + " " }), b.myth.text)
+    ));
+    return wrap;
+  }
+  function renderGuideBlock(b) {
+    var LV = ATLAS.levels;
+    if (b.kind === "keypoints") {
+      return el("div", { class: "gblock" }, gLabel(b.label),
+        el("div", { class: "keypoints" }, (b.items || []).map(function (it, i) {
+          return el("div", { class: "kpoint" },
+            el("span", { class: "kpoint__n", text: String(i + 1) }),
+            el("div", { class: "kpoint__text", text: it })
+          );
+        }))
+      );
+    }
+    if (b.kind === "slotboard") {
+      return el("div", { class: "gblock" }, gLabel(b.label), guideSlotboard(b));
+    }
+    if (b.kind === "cards") {
+      return el("div", { class: "gblock" }, gLabel(b.label, b.hint),
+        el("div", { class: "gcards" + (b.cols ? " gcards--" + b.cols : "") }, (b.items || []).map(function (c) {
+          return el("div", { class: "gcard" + (c.tone ? " tone-" + c.tone : "") },
+            el("div", { class: "gcard__head" },
+              c.sym ? el("span", { class: "gcard__sym", text: c.sym }) : null,
+              el("span", { class: "gcard__title", text: c.title }),
+              c.badge ? el("span", { class: "gcard__badge" + (c.tone ? " tone-" + c.tone : ""), text: c.badge }) : null
+            ),
+            c.desc ? el("div", { class: "gcard__desc", text: c.desc }) : null
+          );
+        }))
+      );
+    }
+    if (b.kind === "mods") {
+      var legend = b.legend ? el("div", { class: "legend" },
+        el("span", { class: "legend-badge lvl-c--mandatory", text: LV.mandatory }),
+        el("span", { class: "legend-badge lvl-c--strong", text: LV.strong }),
+        el("span", { class: "legend-badge lvl-c--nice", text: LV.nice })
+      ) : null;
+      var list = el("div", { class: "mods__list" }, (b.items || []).map(function (m) {
+        return el("div", { class: "mod" },
+          el("div", { class: "mod__row" },
+            el("div", { class: "mod__name", text: m.name }),
+            el("span", { class: "mod__badge lvl-c--" + m.level, text: LV[m.level] || m.level })
+          ),
+          el("div", { class: "mod__why", text: m.why })
+        );
+      }));
+      return el("div", { class: "gblock" }, gLabel(b.label, b.hint), legend, el("div", { class: "card" }, list));
+    }
+    if (b.kind === "callout") {
+      var tone = b.tone || "info";
+      var box = el("div", { class: "callout callout--" + tone },
+        el("div", { class: "callout__head" },
+          el("span", { class: "callout__icon", text: b.icon || (tone === "warn" ? "⚠" : tone === "good" ? "✦" : "◈") }),
+          el("span", { class: "callout__title", text: b.title })
+        )
+      );
+      if (b.text) box.appendChild(el("div", { class: "callout__text", text: b.text }));
+      if (b.items) box.appendChild(el("ul", { class: "callout__list" }, b.items.map(function (it) { return el("li", { text: it }); })));
+      return el("div", { class: "gblock" }, box);
+    }
+    if (b.kind === "pairings") {
+      return el("div", { class: "gblock" }, gLabel(b.label),
+        el("div", { class: "pairings" }, (b.items || []).map(function (p) {
+          return el("div", { class: "pair" },
+            el("div", { class: "pair__sit", text: p.situation }),
+            el("div", { class: "pair__flow" },
+              el("span", { class: "pair__chip pair__chip--map" }, el("span", { class: "pair__chipk", text: "MAP" }), el("span", { class: "pair__chipv", text: p.map })),
+              el("span", { class: "pair__arrow", text: "→" }),
+              el("span", { class: "pair__chip pair__chip--tab" }, el("span", { class: "pair__chipk", text: "TABLET" }), el("span", { class: "pair__chipv", text: p.tablet }))
+            ),
+            el("div", { class: "pair__why", text: p.why })
+          );
+        }))
+      );
+    }
+    if (b.kind === "steps") {
+      var wrap = el("div", { class: "gblock" }, gLabel(b.label, b.hint));
+      if (b.intro) wrap.appendChild(el("div", { class: "gblock__intro", text: b.intro }));
+      (b.items || []).forEach(function (s, i) {
+        wrap.appendChild(el("div", { class: "astep" },
+          el("span", { class: "astep__n", text: i + 1 }),
+          el("div", { class: "astep__body" },
+            el("div", { class: "astep__title", text: s.title }),
+            el("div", { class: "astep__detail", text: s.detail }),
+            s.tags ? el("div", { class: "passives" }, s.tags.map(function (t) { return el("span", { class: "passive", text: t }); })) : null
+          )
+        ));
+      });
+      return wrap;
+    }
+    if (b.kind === "tiers") {
+      return el("div", { class: "gblock" }, gLabel(b.label, b.hint),
+        el("div", { class: "tierlist" }, (b.items || []).map(function (t) {
+          var tcls = t.tier === "S" ? "mandatory" : (t.tier === "A" ? "strong" : "nice");
+          return el("div", { class: "tier-row" },
+            el("span", { class: "tier-badge lvl-c--" + tcls, text: t.tier }),
+            el("span", { class: "tier-name", text: t.name }),
+            el("span", { class: "tier-price lvl-c--" + tcls, text: t.price })
+          );
+        }))
+      );
+    }
+    if (b.kind === "prose") {
+      var card = el("div", { class: "card guide-prose" });
+      (b.paras || []).forEach(function (p) { card.appendChild(el("p", { class: "guide-prose__p", text: p })); });
+      return el("div", { class: "gblock" }, gLabel(b.label), card);
+    }
+    if (b.kind === "sources") {
+      return el("div", { class: "gblock" }, gLabel(b.label || "Források"),
+        el("div", { class: "sources" }, (b.items || []).map(function (s) {
+          return el("a", { class: "source-link", href: s.url, target: "_blank", rel: "noopener", text: s.label + " ↗" });
+        }))
+      );
+    }
+    return null;
+  }
+  function renderGuide(goal) {
+    var head = el("div", { class: "rhead" },
+      el("span", { class: "rhead__glyph" }, glyph(goal.icon)),
+      el("div", { class: "rhead__main" },
+        el("div", { class: "rhead__title", text: goal.label }),
+        el("div", { class: "rhead__mech", text: goal.mech })
+      ),
+      goal.patch ? el("span", { class: "guide-patch", text: goal.patch }) : null
+    );
+    var sec = el("section", {}, head);
+    if (goal.intro) sec.appendChild(el("p", { class: "intro", text: goal.intro }));
+    (goal.blocks || []).forEach(function (b) { sec.appendChild(renderGuideBlock(b)); });
+    if (goal.videoSeconds) sec.appendChild(videoCta(goal));
+    return sec;
+  }
+
   function renderContent() {
     var goal = currentGoal();
     if (goal.type === "atlastree") return renderAtlasTree(goal);
     if (goal.type === "delirium") return renderDelirium(goal);
+    if (goal.type === "guide") return renderGuide(goal);
     if (goal.type === "stub") return renderStub(goal);
     return renderRecipe(goal);
   }
