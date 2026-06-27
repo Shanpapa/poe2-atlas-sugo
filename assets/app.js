@@ -600,6 +600,11 @@
         }))
       );
     }
+    if (b.kind === "pills") {
+      return el("div", { class: "gblock" }, gLabel(b.label),
+        el("div", { class: "pills" }, (b.items || []).map(function (p) { return pill(p.k, p.v); }))
+      );
+    }
     if (b.kind === "mods") {
       var legend = b.legend ? el("div", { class: "legend" },
         el("span", { class: "legend-badge lvl-c--mandatory", text: LV.mandatory }),
