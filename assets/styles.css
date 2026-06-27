@@ -322,6 +322,9 @@ a { color: inherit; }
 .site-footer { margin-top: 38px; padding: 18px 0 0; border-top: 1px solid var(--line-soft); display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: #5f5a50; }
 .site-footer__note { max-width: 640px; line-height: 1.5; }
 .site-footer__ver { font-family: var(--font-mono); white-space: nowrap; }
+.site-footer__right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.site-footer__hits { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; color: var(--gold); border: 1px solid rgba(203,169,104,.3); border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+.site-footer__hits-ico { color: var(--gold-bright); }
 
 /* ----- Atlas Passzív Fa nézet (type: atlastree) ------------------------- */
 .combo-title--mt { margin-top: 24px; }

@@ -23,6 +23,7 @@
     atlasView: "overview",   // "overview" | "main" | <mechanika neve>
     atlasSel: null,          // a kiválasztott node neve a fókuszált nézetben
   };
+  var visitCount = null;     // látogatószámláló cache (Abacus API); null = még nincs/elrejtve
 
   /* --- apró DOM-segédek -------------------------------------------------- */
   function el(tag, attrs) {
@@ -140,11 +141,48 @@
       )
     );
   }
+  /* --- látogatószámláló (Abacus — signup-mentes counter API) -------------
+     Böngészőnként EGYSZER növel (localStorage flag), utána csak olvas →
+     ~egyedi látogatókat számol. A valós "visits" csak az éles domainen nő;
+     localhoston külön "visits-dev" kulcs, hogy a teszt ne piszkítsa.
+     Hiba esetén a számláló rejtve marad, az oldal megy tovább. */
+  function fmtHits(n) { try { return Number(n).toLocaleString("hu-HU"); } catch (e) { return String(n); } }
+  function fillHits(span, n) {
+    span.textContent = "";
+    span.appendChild(el("span", { class: "site-footer__hits-ico", text: "◆" }));
+    span.appendChild(document.createTextNode(" " + fmtHits(n) + " kalandozó járt itt"));
+  }
+  function hitsEl() {
+    var span = el("span", { class: "site-footer__hits", id: "visitHits" });
+    if (visitCount != null) fillHits(span, visitCount);
+    return span;
+  }
+  function initCounter() {
+    var NS = "shanpapa.github.io";
+    var live = /github\.io$/i.test(location.hostname);
+    var key = live ? "visits" : "visits-dev";
+    var flag = "poe2_counted_" + key;
+    var first = true;
+    try { first = !localStorage.getItem(flag); } catch (e) {}
+    fetch("https://abacus.jasoncameron.dev/" + (first ? "hit" : "get") + "/" + NS + "/" + key)
+      .then(function (r) { if (!r.ok) throw new Error("counter"); return r.json(); })
+      .then(function (d) {
+        if (!d || typeof d.value !== "number") return;
+        visitCount = d.value;
+        if (first) { try { localStorage.setItem(flag, "1"); } catch (e) {} }
+        var span = document.getElementById("visitHits");
+        if (span) fillHits(span, visitCount);
+      })
+      .catch(function () {});
+  }
   function renderFooter() {
     var M = ATLAS.meta;
     return el("footer", { class: "site-footer" },
       el("span", { class: "site-footer__note", text: M.footerNote }),
-      el("span", { class: "site-footer__ver", text: M.footerVersion })
+      el("div", { class: "site-footer__right" },
+        hitsEl(),
+        el("span", { class: "site-footer__ver", text: M.footerVersion })
+      )
     );
   }
 
@@ -785,4 +823,5 @@
   document.title = ATLAS.meta.title + " — Path of Exile 2";
   initNav();
   render();
+  initCounter();
 })();
