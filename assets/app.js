@@ -78,7 +78,48 @@
     for (var i = 0; i < ATLAS.goals.length; i++) if (ATLAS.goals[i].key === state.goalKey) return ATLAS.goals[i];
     return ATLAS.goals[0];
   }
-  function selectGoal(k) { state.goalKey = k; state.variant = 0; state.primerOpen = false; state.atlasView = "overview"; state.atlasSel = null; render(); }
+  function selectGoal(k) { state.goalKey = k; state.variant = 0; state.primerOpen = false; state.atlasView = "overview"; state.atlasSel = null; pushNav(); render(); }
+
+  /* --- Böngésző-history integráció (back-gomb + deep-link) ---------------
+     A cél- és atlas-nézet-váltás history-bejegyzést kap, így a böngésző
+     Vissza gombja az ELŐZŐ lapra lép, nem ki az oldalról. A hash egyúttal
+     megosztható deep-linket is ad (#/<cél>), és frissítés után ott maradsz. */
+  function goalByKey(k) { for (var i = 0; i < ATLAS.goals.length; i++) if (ATLAS.goals[i].key === k) return ATLAS.goals[i]; return null; }
+  function stateToHash() {
+    var g = state.goalKey;
+    if (g === "atlasfa" && state.atlasView && state.atlasView !== "overview") return "#/" + g + "/" + encodeURIComponent(state.atlasView);
+    return "#/" + g;
+  }
+  function parseHash() {
+    var h = (location.hash || "").replace(/^#\/?/, "");
+    if (!h) return { goal: ATLAS.goals[0].key, view: "overview" };
+    var parts = h.split("/").map(function (s) { try { return decodeURIComponent(s); } catch (e) { return s; } });
+    return { goal: parts[0], view: parts[1] || "overview" };
+  }
+  function normView(goalKey, view) {
+    if (goalKey !== "atlasfa") return "overview";
+    if (view === "overview" || view === "main") return view;
+    var g = goalByKey(goalKey);
+    return (g && findTree(g, view)) ? view : "overview";
+  }
+  function pushNav() { var h = stateToHash(); if (location.hash === h) return; try { history.pushState({ goal: state.goalKey, view: state.atlasView }, "", h); } catch (e) {} }
+  function applyNav(st) {
+    st = st || parseHash();
+    state.goalKey = goalByKey(st.goal) ? st.goal : ATLAS.goals[0].key;
+    state.atlasView = normView(state.goalKey, st.view);
+    state.variant = 0; state.primerOpen = false; state.atlasSel = null;
+    render();
+  }
+  function setAtlasView(view) { state.atlasView = view; state.atlasSel = null; pushNav(); render(); }
+  function seeAlsoRow(items) {
+    return el("div", { class: "seealso" },
+      el("span", { class: "seealso__label", text: "Lásd még" }),
+      el("div", { class: "seealso__links" }, (items || []).map(function (it) {
+        return el("button", { class: "seealso__link", type: "button", onclick: function () { selectGoal(it.goal); } },
+          el("span", { class: "seealso__arrow", text: "→" }), it.text);
+      }))
+    );
+  }
 
   /* --- fejléc / lábléc --------------------------------------------------- */
   function renderHeader() {
@@ -298,6 +339,7 @@
       el("div", { class: "card__label card__label--tight", text: L.rewardsLabel }),
       el("div", { class: "rewards__text", text: goal.rewards })
     ));
+    if (goal.seealso) sec.appendChild(seeAlsoRow(goal.seealso));
     sec.appendChild(videoCta(goal));
     return sec;
   }
@@ -419,7 +461,7 @@
     var labelY = (isTri ? cy + r * 0.6 : cy + r) + 26;
     g.appendChild(svgText({ x: cx, y: labelY, "text-anchor": "middle", fill: "#e1d9c6", "font-family": "'Cinzel',serif", "font-weight": "700", "font-size": "16", "letter-spacing": "1.2" }, tree.name));
     g.appendChild(svgText({ x: cx, y: labelY + 16, "text-anchor": "middle", fill: "#857f6e", "font-family": "'JetBrains Mono',monospace", "font-size": "10.5" }, tree.sub || ""));
-    g.addEventListener("click", function () { state.atlasView = tree.name; state.atlasSel = null; render(); });
+    g.addEventListener("click", function () { setAtlasView(tree.name); });
     return g;
   }
   function mainMedallionGroup(goal, cx, cy, r) {
@@ -438,7 +480,7 @@
     });
     g.appendChild(svgText({ x: cx, y: cy + r + 28, "text-anchor": "middle", fill: "#f0ead9", "font-family": "'Cinzel',serif", "font-weight": "700", "font-size": "19", "letter-spacing": "2" }, "FŐ ATLAS-FA"));
     g.appendChild(svgText({ x: cx, y: cy + r + 46, "text-anchor": "middle", fill: "#9a9277", "font-family": "'JetBrains Mono',monospace", "font-size": "11" }, "sustain-first · 1 → 10 · kezdd itt"));
-    g.addEventListener("click", function () { state.atlasView = "main"; state.atlasSel = null; render(); });
+    g.addEventListener("click", function () { setAtlasView("main"); });
     return g;
   }
   function atlasOverview(goal) {
@@ -511,7 +553,7 @@
     else { var t0 = findTree(goal, view); caption = t0 ? (t0.name + " — node-ok fontosság szerint, a legerősebb vonallal.") : ""; }
 
     var capRow = el("div", { class: "atlas-caption" });
-    if (view !== "overview") capRow.appendChild(el("button", { class: "atlas-back", type: "button", onclick: function () { state.atlasView = "overview"; state.atlasSel = null; render(); } }, "← Áttekintés"));
+    if (view !== "overview") capRow.appendChild(el("button", { class: "atlas-back", type: "button", onclick: function () { setAtlasView("overview"); } }, "← Áttekintés"));
     capRow.appendChild(el("span", { class: "atlas-caption__text", text: caption }));
     capRow.appendChild(el("div", { class: "atlas-legend" },
       el("span", {}, el("i", { class: "lc-mandatory" }), "Kötelező"),
@@ -688,6 +730,9 @@
         }))
       );
     }
+    if (b.kind === "seealso") {
+      return el("div", { class: "gblock" }, seeAlsoRow(b.items));
+    }
     return null;
   }
   function renderGuide(goal) {
@@ -729,6 +774,15 @@
   }
   function render() { mount.replaceChildren(buildPage()); }
 
+  function initNav() {
+    var st = parseHash();
+    state.goalKey = goalByKey(st.goal) ? st.goal : ATLAS.goals[0].key;
+    state.atlasView = normView(state.goalKey, st.view);
+    try { history.replaceState({ goal: state.goalKey, view: state.atlasView }, "", stateToHash()); } catch (e) {}
+  }
+  window.addEventListener("popstate", function (e) { applyNav(e.state); });
+
   document.title = ATLAS.meta.title + " — Path of Exile 2";
+  initNav();
   render();
 })();

@@ -87,6 +87,11 @@
         ],
       },
 
+      {
+        kind: "seealso",
+        items: [{ goal: "delirium", text: "Delirium — miért kell sűrűség mellé" }],
+      },
+
     ],
   });
 })();

@@ -277,6 +277,8 @@ window.ATLAS = {
         { rank: 3, tier: "B", strength: 1, title: "Ritual + Delirium", desc: "Más logika: indirekt. Több mob → több tribute → több reroll → omen." },
       ],
       rewards: "Currency, catalyst (most főleg Breach/genesis fa) és simulacrum splinter — gyakran a simulacrum többet ér, mint a teljes map loot. Cél: high size, monster effectiveness, item rarity.",
+      // Kereszthivatkozás a konkrét recept-lapra (kattintásra odavált).
+      seealso: [{ goal: "simulacrum", text: "Simulacrum farm — kész recept" }],
     },
 
     /* ===== 5) BOSS FARM (placeholder) ===== */
