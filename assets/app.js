@@ -22,6 +22,7 @@
     primerOpen: false,
     atlasView: "overview",   // "overview" | "main" | <mechanika neve>
     atlasSel: null,          // a kiválasztott node neve a fókuszált nézetben
+    helper: null,            // a Loadout helper UI-állapota (lazy init: ensureHelper)
   };
   var visitCount = null;     // látogatószámláló cache (Abacus API); null = még nincs/elrejtve
 
@@ -69,6 +70,7 @@
     else if (type === "atlas") kids = [L({ x1: 12, y1: 12, x2: 5, y2: 6 }), L({ x1: 12, y1: 12, x2: 19, y2: 7 }), L({ x1: 12, y1: 12, x2: 7, y2: 18 }), L({ x1: 12, y1: 12, x2: 18, y2: 17 }), C({ cx: 12, cy: 12, r: 2.4, fill: "currentColor", stroke: "none" }), C({ cx: 5, cy: 6, r: 1.8 }), C({ cx: 19, cy: 7, r: 1.8 }), C({ cx: 7, cy: 18, r: 1.8 }), C({ cx: 18, cy: 17, r: 1.8 })];
     else if (type === "mapping") kids = [PL({ points: "4,18 9,10 14,15 20,6", fill: "none" }), C({ cx: 4, cy: 18, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 9, cy: 10, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 14, cy: 15, r: 1.6, fill: "currentColor", stroke: "none" }), C({ cx: 20, cy: 6, r: 1.6, fill: "currentColor", stroke: "none" })];
     else if (type === "tablet") kids = [R({ x: 5, y: 3.5, width: 14, height: 17, rx: 2.6 }), P({ points: "12,8.5 15.2,12 12,15.5 8.8,12" }), C({ cx: 12, cy: 12, r: 1, fill: "currentColor", stroke: "none" })];
+    else if (type === "helper") kids = [C({ cx: 12, cy: 12, r: 8.2 }), P({ points: "12,5 14.4,12 12,19 9.6,12", fill: "currentColor", stroke: "none" }), C({ cx: 12, cy: 12, r: 1.5, fill: "currentColor", stroke: "none" })];
     var svg = svgEl("svg", { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 1.4, "stroke-linecap": "round", "stroke-linejoin": "round" });
     kids.forEach(function (k) { svg.appendChild(k); });
     return svg;
@@ -789,9 +791,349 @@
     return sec;
   }
 
+  /* --- Loadout helper: interaktív „mim van → mit toljak" --------------------
+     A katalógus a guides/helper.js-ben (goal.tabletTypes / waystoneFields /
+     archetypes / decision). Itt csak a PONTOZÓ logika + az interaktív UI van.
+     Az állapot a state.helper-ben él (navigáció közt is megmarad); a vezérlők
+     csak a helper-blokkot rajzolják újra (paint), nem az egész oldalt → a
+     görgetés nem ugrik. */
+  function ensureHelper() {
+    if (!state.helper) state.helper = { tablets: {}, tabletItems: {}, openTypes: {}, ws: {}, tier: "high", wsMods: 6, surv: "ok", detailOpen: false };
+    if (!state.helper.tabletItems) state.helper.tabletItems = {};
+    if (!state.helper.openTypes) state.helper.openTypes = {};
+    return state.helper;
+  }
+  function modTierBonus(t) { return t === "jackpot" ? 0.08 : t === "strong" ? 0.05 : 0.02; }
+  function metaWeight(key) {
+    if (key === "abyss" || key === "expedition") return 0.12;
+    if (key === "breach" || key === "delirium") return 0.08;
+    if (key === "ritual" || key === "vaal") return 0.05;
+    return 0.04; // sustain / juice (mindig releváns alap)
+  }
+  function tabletTypeByKey(goal, key) {
+    var T = goal.tabletTypes || [];
+    for (var i = 0; i < T.length; i++) if (T[i].key === key) return T[i];
+    return null;
+  }
+  function slotsFromMods(m) { return m >= 6 ? 3 : m >= 3 ? 2 : 1; }
+  // egy KONKRÉT tablet értéke = a rajta bepipált modok tier-bónuszainak összege
+  function tabletItemValue(tt, ms) {
+    var v = 0; if (!tt || !tt.mods || !ms) return 0;
+    for (var i = 0; i < tt.mods.length; i++) if (ms[tt.mods[i].key]) v += modTierBonus(tt.mods[i].tier);
+    return v;
+  }
+  // a felhasználó adott típusú tabletjei érték szerint csökkenőben ({idx, ms, value})
+  function rankTablets(goal, H, typeKey) {
+    var tt = tabletTypeByKey(goal, typeKey);
+    var items = (H.tabletItems && H.tabletItems[typeKey]) || [];
+    return items.map(function (ms, i) { return { idx: i, ms: ms || {}, value: tabletItemValue(tt, ms || {}) }; })
+      .sort(function (a, b) { return b.value - a.value; });
+  }
+  function tabletItemMods(tt, ms) {
+    var out = []; if (!tt || !tt.mods || !ms) return out;
+    for (var i = 0; i < tt.mods.length; i++) if (ms[tt.mods[i].key]) out.push(tt.mods[i].name);
+    return out;
+  }
+  function slotQuality(v) { return v >= 0.13 ? "jackpot" : v >= 0.08 ? "erős" : v > 0 ? "ok" : "üres"; }
+  function huArt(name) { return /^[aeiouáéíóöőúüű]/i.test(String(name || "")) ? "az" : "a"; }
+  function scoreArchetype(a, H, goal) {
+    var want = a.want || {}, ideal = want.ideal || 3;
+    var have = (H.tablets[want.tablet] || 0);
+    var tabletFit = ideal ? Math.min(have, ideal) / ideal : 0;
+    var likes = a.wsLikes || [], got = 0;
+    for (var i = 0; i < likes.length; i++) if (H.ws[likes[i]]) got++;
+    var wsFit = likes.length ? got / likes.length : 0.5;
+    var score = tabletFit * 0.6 + wsFit * 0.2 + metaWeight(a.key);
+    if ((a.alt || []).indexOf("unique") >= 0 && (H.tablets.unique || 0) > 0) score += 0.05;
+    if (a.key === "sustain" && H.tier === "low") score += 0.35;     // sustain-first kis tieren
+    if (a.key === "sustain" && (H.tablets.overseer || 0) > 0) score += 0.05;
+    // opcionális tabletenkénti bónusz: a TE legjobb N tabletedből (N = slotok), ha megadtad
+    var modBonus = 0, items = (H.tabletItems && H.tabletItems[want.tablet]) || null;
+    if (items && items.length) {
+      var useN = Math.min(ideal, slotsFromMods(H.wsMods)), ranked = rankTablets(goal, H, want.tablet);
+      for (var k = 0; k < useN && k < ranked.length; k++) modBonus += ranked[k].value;
+      if (modBonus > 0.15) modBonus = 0.15;
+    }
+    score += modBonus;
+    var gated = false;
+    if (a.risk === "high" && H.surv === "squishy") { score = score * 0.55; gated = true; }
+    return { score: score, tabletFit: tabletFit, wsFit: wsFit, have: have, ideal: ideal, gated: gated, modBonus: modBonus };
+  }
+
+  function renderHelper(goal) {
+    var H = ensureHelper(), LV = ATLAS.levels, D = goal.decision || {};
+    function tabletName(key) {
+      for (var i = 0; i < goal.tabletTypes.length; i++) if (goal.tabletTypes[i].key === key) return goal.tabletTypes[i].name;
+      return key;
+    }
+
+    var head = el("div", { class: "rhead" },
+      el("span", { class: "rhead__glyph" }, glyph(goal.icon)),
+      el("div", { class: "rhead__main" },
+        el("div", { class: "rhead__title", text: goal.label }),
+        el("div", { class: "rhead__mech", text: goal.mech })
+      ),
+      goal.patch ? el("span", { class: "guide-patch", text: goal.patch }) : null
+    );
+    var sec = el("section", {}, head);
+    if (goal.intro) sec.appendChild(el("p", { class: "intro", text: goal.intro }));
+
+    var body = el("div", { class: "helper" });
+
+    /* --- kis UI-építők --------------------------------------------------- */
+    function seg(label, opts, cur, onpick) { // szegmentált egy-választós
+      return el("div", { class: "hfield" },
+        el("div", { class: "hfield__lab", text: label }),
+        el("div", { class: "hseg" }, opts.map(function (o) {
+          return el("button", { class: "hseg__b" + (o.v === cur ? " is-on" : ""), type: "button", onclick: function () { onpick(o.v); } }, o.t);
+        }))
+      );
+    }
+
+    function paint() {
+      body.replaceChildren();
+
+      /* === 1. VEZÉRLŐK === */
+      var controls = el("div", { class: "hcard" },
+        el("div", { class: "hcard__lab", text: "1 · Mid van? (tabletek — kattints: +1, jobbklikk: −1)" }),
+        el("div", { class: "hchips" }, goal.tabletTypes.map(function (t) {
+          var n = H.tablets[t.key] || 0;
+          return el("button", {
+            class: "hchip" + (n > 0 ? " is-on" : ""), type: "button", title: t.hu,
+            onclick: function () { H.tablets[t.key] = (n + 1) % 7; paint(); },
+            oncontextmenu: function (e) { e.preventDefault(); H.tablets[t.key] = (n + 6) % 7; paint(); }
+          },
+            el("span", { class: "hchip__n", text: t.name }),
+            el("span", { class: "hchip__c" + (n > 0 ? " is-on" : ""), text: n > 0 ? (n === 6 ? "6+" : String(n)) : "0" })
+          );
+        }))
+      );
+
+      var ws = el("div", { class: "hcard" },
+        el("div", { class: "hcard__lab", text: "2 · A waystone-od modjai (kattints, ha jellemzően van rajta)" }),
+        el("div", { class: "hchips" }, goal.waystoneFields.map(function (f) {
+          var on = !!H.ws[f.key];
+          return el("button", { class: "hchip" + (on ? " is-on" : ""), type: "button", title: f.real + " — " + f.hu, onclick: function () { H.ws[f.key] = !on; paint(); } },
+            el("span", { class: "hchip__n", text: f.name }),
+            el("span", { class: "hchip__c" + (on ? " is-on" : ""), text: on ? "✓" : "+" })
+          );
+        })),
+        seg("A legjobb waystone-od mod-száma (ez adja a slotokat):",
+          [0, 1, 2, 3, 4, 5, 6].map(function (m) { return { v: m, t: String(m) }; }), H.wsMods, function (v) { H.wsMods = v; paint(); }),
+        seg("Tier:", [{ v: "low", t: "T1–10" }, { v: "mid", t: "T11–14" }, { v: "high", t: "T15–16" }], H.tier, function (v) { H.tier = v; paint(); }),
+        seg("Mennyit bír a karaktered?:", [{ v: "squishy", t: "Szottyos" }, { v: "ok", t: "Elmegy" }, { v: "tanky", t: "Tank" }], H.surv, function (v) { H.surv = v; paint(); })
+      );
+      // --- opcionális: TABLETENKÉNTI mod-bevitel (csak amiből van darabod) ---
+      var ownedTypes = goal.tabletTypes.filter(function (t) { return (H.tablets[t.key] || 0) > 0 && t.mods && t.mods.length; });
+      if (ownedTypes.length) {
+        var det = el("div", { class: "hdetail" });
+        det.appendChild(el("button", { class: "hdetail__toggle", type: "button", onclick: function () { H.detailOpen = !H.detailOpen; paint(); } },
+          el("span", { class: "hdetail__chev", text: H.detailOpen ? "▾" : "▸" }),
+          "Tabletenkénti modok (opcionális — megmondja, melyiket slotold)"
+        ));
+        if (H.detailOpen) {
+          ownedTypes.forEach(function (t) {
+            var cnt = H.tablets[t.key] || 0;
+            var items = H.tabletItems[t.key] || (H.tabletItems[t.key] = []);
+            while (items.length < cnt) items.push({});   // a sorok számát a darabszámhoz igazítjuk
+            if (items.length > cnt) items.length = cnt;
+            var filled = items.filter(function (ms) { for (var k in ms) if (ms[k]) return true; return false; }).length;
+            var open = !!H.openTypes[t.key];
+            var grp = el("div", { class: "hdetail__grp" + (open ? " is-open" : "") });
+            grp.appendChild(el("button", { class: "hdetail__grphead", type: "button", onclick: function () { H.openTypes[t.key] = !open; paint(); } },
+              el("span", { class: "hdetail__chev", text: open ? "▾" : "▸" }),
+              el("span", { class: "hdetail__name", text: t.name + " ×" + cnt }),
+              el("span", { class: "hdetail__summary", text: filled + "/" + cnt + " kitöltve" })
+            ));
+            if (open) items.forEach(function (ms, ri) {
+              grp.appendChild(el("div", { class: "titem" },
+                el("span", { class: "titem__lab", text: "Tablet " + (ri + 1) }),
+                el("div", { class: "hchips" }, t.mods.map(function (m) {
+                  var on = !!ms[m.key];
+                  return el("button", { class: "hchip hchip--sm" + (on ? " is-on" : ""), type: "button", title: m.hu, onclick: function () { ms[m.key] = !on; paint(); } },
+                    el("span", { class: "hchip__n", text: m.name }),
+                    el("span", { class: "hchip__c" + (on ? " is-on" : ""), text: on ? "✓" : "+" })
+                  );
+                }))
+              ));
+            });
+            det.appendChild(grp);
+          });
+        }
+        controls.appendChild(det);
+      }
+
+      controls.appendChild(el("div", { class: "hreset" },
+        el("button", { class: "hreset__b", type: "button", onclick: function () { state.helper = null; H = ensureHelper(); paint(); } }, "Nullázás")
+      ));
+
+      body.appendChild(controls);
+      body.appendChild(ws);
+
+      /* === 2. ÁLLAPOT-SÁV (slot + respawn) === */
+      var slots = slotsFromMods(H.wsMods);
+      var rev = (D.revivesByMods || [5, 5, 4, 3, 2, 1, 0])[H.wsMods];
+      var status = el("div", { class: "hstatus" },
+        el("span", { class: "hstatus__b" }, el("b", { text: H.wsMods + " mod" }), " → ", el("b", { text: slots + " tablet-slot" }), (slots < 3 ? el("span", { class: "hstatus__mut", text: " (mind a 3-hoz 6-mod waystone kell)" }) : null)),
+        el("span", { class: "hstatus__b" + (rev <= 1 ? " is-warn" : "") }, el("b", { text: rev + " respawn" }), (rev === 0 ? " · egy halál = elveszett map!" : ""))
+      );
+      if (H.tier === "high" && H.ws.drop) status.appendChild(el("span", { class: "hstatus__mut", text: "Waystone Drop Chance T15–16-on már lényegtelen (a T15 a legmagasabb drop)." }));
+      body.appendChild(status);
+
+      /* === 3. EREDMÉNY (rangsorolt loadoutok) === */
+      var ranked = goal.archetypes.map(function (a) { return { a: a, sc: scoreArchetype(a, H, goal) }; })
+        .sort(function (x, y) { return y.sc.score - x.sc.score; });
+
+      var anyTablet = goal.tabletTypes.some(function (t) { return (H.tablets[t.key] || 0) > 0; });
+      body.appendChild(el("div", { class: "hresult-head" },
+        el("span", { class: "hresult-head__t", text: anyTablet ? "Neked ezt ajánlom" : "Általános default (pipálj be amid van → élesedik a rangsor)" }),
+        el("span", { class: "hresult-head__h", text: "illeszkedés szerint" })
+      ));
+
+      // sustain-first emlékeztető
+      if (D.sustainFirst) body.appendChild(el("div", { class: "callout callout--good" },
+        el("div", { class: "callout__head" }, el("span", { class: "callout__icon", text: "✦" }), el("span", { class: "callout__title", text: "Sustain-first" })),
+        el("div", { class: "callout__text", text: D.sustainFirst })
+      ));
+
+      ranked.slice(0, 3).forEach(function (r, idx) { body.appendChild(loadoutCard(r.a, r.sc, slots, idx + 1)); });
+
+      // a többi opció kcompakt sorként
+      var rest = ranked.slice(3);
+      if (rest.length) {
+        body.appendChild(el("div", { class: "hmore" },
+          el("div", { class: "hmore__lab", text: "További opciók" }),
+          el("div", { class: "hmore__list" }, rest.map(function (r) {
+            return el("div", { class: "hmore__row" },
+              el("span", { class: "hmore__name", text: r.a.label }),
+              el("span", { class: "hmore__pct", text: Math.min(99, Math.round(r.sc.score * 100)) + "%" })
+            );
+          }))
+        ));
+      }
+
+      /* === 4. ÁLLANDÓ REFERENCIA === */
+      if (D.dontCombine) body.appendChild(el("div", { class: "gblock" },
+        el("div", { class: "callout callout--warn" },
+          el("div", { class: "callout__head" }, el("span", { class: "callout__icon", text: "×" }), el("span", { class: "callout__title", text: "Mit NE kombinálj" })),
+          el("ul", { class: "callout__list" }, D.dontCombine.map(function (it) { return el("li", { text: it }); }))
+        )
+      ));
+      if (D.dangerMods) body.appendChild(el("div", { class: "gblock" },
+        el("div", { class: "callout callout--warn" },
+          el("div", { class: "callout__head" }, el("span", { class: "callout__icon", text: "⚠" }), el("span", { class: "callout__title", text: "Veszélyes waystone-modok (kezdőként kerüld)" })),
+          el("ul", { class: "callout__list" }, D.dangerMods.map(function (it) { return el("li", { text: it }); }))
+        )
+      ));
+      if (goal.sources) body.appendChild(el("div", { class: "gblock" }, gLabel("Források · 0.5.x"),
+        el("div", { class: "sources" }, goal.sources.map(function (s) { return el("a", { class: "source-link", href: s.url, target: "_blank", rel: "noopener", text: s.label + " ↗" }); }))
+      ));
+    }
+
+    /* --- egy loadout-kártya ---------------------------------------------- */
+    function loadoutCard(a, sc, slots, rank) {
+      var pct = Math.min(99, Math.round(sc.score * 100));
+      var primaryName = tabletName((a.want || {}).tablet);
+      var card = el("div", { class: "lcard" + (rank === 1 ? " is-top" : "") });
+
+      card.appendChild(el("div", { class: "lcard__head" },
+        el("span", { class: "lcard__glyph" }, glyph(a.icon)),
+        el("div", { class: "lcard__main" },
+          el("div", { class: "lcard__title", text: a.label }),
+          el("div", { class: "lcard__mech", text: a.mech })
+        ),
+        el("div", { class: "lcard__meta" },
+          el("span", { class: "lcard__metatag", text: a.meta || "" }),
+          el("div", { class: "matchbar", title: "illeszkedés: " + pct + "%" }, el("span", { class: "matchbar__fill", style: "width:" + pct + "%" })),
+          el("span", { class: "matchbar__pct", text: pct + "%" })
+        )
+      ));
+
+      // van/kell sor a fő tabletre
+      if ((a.want || {}).ideal) {
+        var need = sc.ideal - sc.have;
+        var ok = sc.have >= sc.ideal;
+        card.appendChild(el("div", { class: "lhave" + (ok ? " is-ok" : (sc.have > 0 ? " is-part" : " is-miss")) },
+          el("span", { class: "lhave__ic", text: ok ? "✓" : (sc.have > 0 ? "◐" : "○") }),
+          el("span", {}, "Neked " + sc.have + "/" + sc.ideal + " " + primaryName + (ok ? " — megvan a stack!" : (sc.have > 0 ? (" — még " + need + " kéne") : " — ehhez kéne tablet")))
+        ));
+      }
+
+      // slot-valóság
+      if ((a.want || {}).ideal >= 3 && slots < 3) {
+        card.appendChild(el("div", { class: "lnote", text: "A waystone-odon most csak " + slots + " slot nyílik → " + slots + " tablet fér be (a teljes stackhez 6-mod waystone kell)." }));
+      }
+
+      // tabletenkénti slot-ajánlás (csak ha megadtál tabletenkénti modot erre a típusra)
+      var ttC = tabletTypeByKey(goal, (a.want || {}).tablet);
+      var rankedT = rankTablets(goal, H, (a.want || {}).tablet);
+      if (ttC && rankedT.length && rankedT.some(function (r) { return r.value > 0; })) {
+        var useN = Math.min((a.want || {}).ideal || 3, slots);
+        var chosen = rankedT.slice(0, useN), bench = rankedT.slice(useN);
+        var lb = el("div", { class: "lblock" }, el("div", { class: "lblock__lab", text: "Slotold ezeket " + huArt(primaryName) + " " + primaryName + " tabletjeidet (a legjobb " + useN + ")" }));
+        var list = el("div", { class: "lslots" });
+        chosen.forEach(function (r) {
+          var mods = tabletItemMods(ttC, r.ms), q = slotQuality(r.value);
+          list.appendChild(el("div", { class: "lslot lslot--pick" },
+            el("span", { class: "lslot__n", text: "Tablet " + (r.idx + 1) }),
+            el("span", { class: "lslot__mods", text: mods.length ? mods.join(" · ") : "nincs értelmes mod" }),
+            el("span", { class: "lslot__q lvl-c--" + (q === "jackpot" ? "mandatory" : q === "erős" ? "strong" : "nice"), text: q })
+          ));
+        });
+        lb.appendChild(list);
+        if (bench.length) lb.appendChild(el("div", { class: "lslot-bench" }, "Padon marad: " + bench.map(function (r) {
+          var mods = tabletItemMods(ttC, r.ms); return "Tablet " + (r.idx + 1) + (mods.length ? " (" + mods.join(", ") + ")" : " (üres)");
+        }).join(" · ") + " — gyengébb, cseréld/add el, ha jobb jön."));
+        card.appendChild(lb);
+      }
+
+      // warn / risk-gate
+      if (sc.gated) card.appendChild(el("div", { class: "warn" }, el("span", { class: "warn__icon", text: "⚠" }), el("div", { class: "warn__text", text: "Szottyos buildre kockázatos: " + (a.warn || "ez magas-kockázatú tartalom — előbb tankosodj.") })));
+      else if (a.warn) card.appendChild(el("div", { class: "warn" }, el("span", { class: "warn__icon", text: "⚠" }), el("div", { class: "warn__text", text: a.warn })));
+
+      // master + waystone
+      card.appendChild(el("div", { class: "pills" }, pill("Master", a.master)));
+      card.appendChild(el("div", { class: "lblock" }, el("div", { class: "lblock__lab", text: "Waystone" }), el("div", { class: "lblock__txt", text: a.waystone })));
+
+      // tablet-stack
+      card.appendChild(el("div", { class: "lblock" }, el("div", { class: "lblock__lab", text: "Tablet-stack" }),
+        el("div", { class: "tablets" }, (a.stack || []).map(function (s) {
+          var main = el("div", { class: "tablet__main" }, el("div", { class: "tablet__name", text: s.name }));
+          if (s.note) main.appendChild(el("div", { class: "tablet__note", text: s.note }));
+          return el("div", { class: "tablet" }, el("span", { class: "tablet__qty", text: s.qty }), main);
+        }))
+      ));
+
+      // atlas node-ok
+      card.appendChild(el("div", { class: "lblock" }, el("div", { class: "lblock__lab", text: "Atlas node-ok" }),
+        el("div", { class: "mods__list" }, (a.nodes || []).map(function (n) {
+          return el("div", { class: "mod" },
+            el("div", { class: "mod__row" },
+              el("a", { class: "mod__name lnode", href: poe2dbUrl(n.name), target: "_blank", rel: "noopener", text: n.name }),
+              el("span", { class: "mod__badge lvl-c--" + n.level, text: LV[n.level] || n.level })
+            ),
+            el("div", { class: "mod__why", text: n.why })
+          );
+        }))
+      ));
+
+      // miért
+      card.appendChild(el("div", { class: "lblock" }, el("div", { class: "lblock__lab", text: "Miért" }),
+        el("ul", { class: "lwhy" }, (a.why || []).map(function (w) { return el("li", { text: w }); }))
+      ));
+
+      return card;
+    }
+
+    paint();
+    sec.appendChild(body);
+    return sec;
+  }
+
   function renderContent() {
     var goal = currentGoal();
     if (goal.type === "atlastree") return renderAtlasTree(goal);
+    if (goal.type === "helper") return renderHelper(goal);
     if (goal.type === "delirium") return renderDelirium(goal);
     if (goal.type === "guide") return renderGuide(goal);
     if (goal.type === "stub") return renderStub(goal);
