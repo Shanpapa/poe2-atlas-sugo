@@ -92,6 +92,11 @@
       },
 
       {
+        kind: "seealso",
+        items: [{ goal: "tablettrade", text: "Tablet bevásárlólista — kész trade keresések (Dartagnan)" }],
+      },
+
+      {
         kind: "sources",
         label: "Források · patch 0.5.x",
         items: [

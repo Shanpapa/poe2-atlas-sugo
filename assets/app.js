@@ -773,6 +773,47 @@
     if (b.kind === "seealso") {
       return el("div", { class: "gblock" }, seeAlsoRow(b.items));
     }
+    if (b.kind === "tradesearch") {
+      /* Trade-site-szerű stat-panel kártyák + direct link gomb.
+         item: { title, badge, tone, sym, desc, groups:[{heading, need, stats:[{name,min,implicit}]}], url } */
+      return el("div", { class: "gblock" }, gLabel(b.label, b.hint),
+        el("div", { class: "tsearches" }, (b.items || []).map(function (s) {
+          var card = el("div", { class: "tsearch" + (s.tone ? " tone-" + s.tone : "") });
+          card.appendChild(el("div", { class: "tsearch__head" },
+            el("span", { class: "tsearch__sym", text: s.sym || "◈" }),
+            el("span", { class: "tsearch__title", text: s.title }),
+            s.badge ? el("span", { class: "gcard__badge" + (s.tone ? " tone-" + s.tone : ""), text: s.badge }) : null
+          ));
+          if (s.desc) card.appendChild(el("div", { class: "tsearch__desc", text: s.desc }));
+          var panel = el("div", { class: "tsearch__panel" });
+          (s.groups || []).forEach(function (g) {
+            var grp = el("div", { class: "tsgroup" },
+              el("div", { class: "tsgroup__head" },
+                el("span", { class: "tsgroup__name", text: g.heading }),
+                g.need ? el("span", { class: "tsgroup__need", text: g.need }) : null
+              )
+            );
+            (g.stats || []).forEach(function (st) {
+              grp.appendChild(el("div", { class: "tsrow" },
+                st.implicit ? el("span", { class: "tsrow__imp", text: "implicit" }) : null,
+                el("span", { class: "tsrow__name", text: st.name }),
+                st.min != null ? el("span", { class: "tsrow__min", text: "min " + st.min }) : null
+              ));
+            });
+            panel.appendChild(grp);
+          });
+          card.appendChild(panel);
+          card.appendChild(el("div", { class: "tsearch__foot" },
+            s.note ? el("div", { class: "tsearch__note", text: s.note }) : el("span"),
+            el("a", { class: "tsearch__btn", href: s.url, target: "_blank", rel: "noopener" },
+              el("span", { text: "Keresés megnyitása" }),
+              el("span", { class: "tsearch__btnarrow", text: "↗" })
+            )
+          ));
+          return card;
+        }))
+      );
+    }
     return null;
   }
   function renderGuide(goal) {
